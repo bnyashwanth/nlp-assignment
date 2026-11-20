@@ -1,0 +1,131 @@
+# =============================================================================
+# LinguaBridge AI - Comprehensive .gitignore
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Node.js & Frontend (Vite / React / Capacitor)
+# -----------------------------------------------------------------------------
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+build/
+**/build/
+.npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.eslintcache
+.vite/
+
+# -----------------------------------------------------------------------------
+# Environment Variables & Secrets (Keep .env.example tracked)
+# -----------------------------------------------------------------------------
+.env
+.env.local
+.env.*.local
+*.env
+!*.env.example
+!**/.env.example
+
+# -----------------------------------------------------------------------------
+# Python / FastAPI Runtime & Virtual Environments
+# -----------------------------------------------------------------------------
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+env.bak/
+venv.bak/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+
+# -----------------------------------------------------------------------------
+# Machine Learning Weights & Large Checkpoints (Hugging Face / PyTorch / LoRA)
+# -----------------------------------------------------------------------------
+*.pt
+*.bin
+*.safetensors
+*.onnx
+*.ckpt
+*.h5
+checkpoints/
+**/checkpoints/
+ml/models/
+**/ml/models/
+
+# -----------------------------------------------------------------------------
+# Android & Capacitor Native Builds
+# -----------------------------------------------------------------------------
+**/android/.gradle/
+**/android/build/
+**/android/app/build/
+**/android/captures/
+**/android/.navigation/
+**/android/.externalNativeBuild/
+**/android/.cxx/
+**/android/local.properties
+**/android/app/src/main/assets/public/
+**/android/app/src/main/assets/capacitor.config.json
+**/android/app/src/main/assets/capacitor.plugins.json
+**/android/capacitor-cordova-android-plugins/
+*.apk
+*.aab
+*.dex
+*.class
+
+# -----------------------------------------------------------------------------
+# iOS Native Builds
+# -----------------------------------------------------------------------------
+**/ios/DerivedData/
+**/ios/App/build/
+**/ios/App/App/public/
+**/ios/App/App/capacitor.config.json
+
+# -----------------------------------------------------------------------------
+# IDEs & Code Editors
+# -----------------------------------------------------------------------------
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*.iml
+*.sublime-workspace
+*.sublime-project
+
+# -----------------------------------------------------------------------------
+# Operating System Junk
+# -----------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini

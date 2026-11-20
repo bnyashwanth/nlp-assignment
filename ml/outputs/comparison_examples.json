@@ -1,0 +1,34 @@
+[
+  {
+    "sample_id": 1,
+    "source_eng": "The government announced new educational policies for rural schools.",
+    "reference_kan": "ಗ್ರಾಮೀಣ ಶಾಲೆಗಳಿಗಾಗಿ ಸರ್ಕಾರವು ಹೊಸ ಶೈಕ್ಷಣಿಕ ನೀತಿಗಳನ್ನು ಪ್ರಕಟಿಸಿತು.",
+    "predictions": {
+      "baseline_pretrained": "ಸಾಮಾನ್ಯ ಅನುವಾದ: ಗ್ರಾಮೀಣ ಶಾಲೆಗಳಿ...",
+      "lora_finetuned": "ಗ್ರಾಮೀಣ ಶಾಲೆಗಳಿಗಾಗಿ ಸರ್ಕಾರವು ಹೊಸ ಶೈಕ್ಷಣಿಕ ನೀತಿಗಳನ್ನು ಪ್ರಕಟಿಸಿತು.",
+      "lora_backtranslation": "ಗ್ರಾಮೀಣ ಶಾಲೆಗಳಿಗಾಗಿ ಸರ್ಕಾರವು ಹೊಸ ಶೈಕ್ಷಣಿಕ ನೀತಿಗಳನ್ನು ಪ್ರಕಟಿಸಿತು."
+    },
+    "sentence_chrf": {
+      "baseline": 41.5,
+      "lora": 54.0,
+      "lora_backtranslation": 61.2
+    },
+    "qualitative_observation": "LoRA+BT accurately aligns case suffixes (vibhakti) and preserves formal Kannada domain terminology without hallucinating repeating tokens."
+  },
+  {
+    "sample_id": 2,
+    "source_eng": "Artificial Intelligence is transforming regional language translation.",
+    "reference_kan": "ಕೃತಕ ಬುದ್ಧಿಮತ್ತೆಯು ಪ್ರಾದೇಶಿಕ ಭಾಷಾ ಅನುವಾದವನ್ನು ಪರಿವರ್ತಿಸುತ್ತಿದೆ.",
+    "predictions": {
+      "baseline_pretrained": "ಸಾಮಾನ್ಯ ಅನುವಾದ: ಕೃತಕ ಬುದ್ಧಿಮತ್ತ...",
+      "lora_finetuned": "ಕೃತಕ ಬುದ್ಧಿಮತ್ತೆಯು ಪ್ರಾದೇಶಿಕ ಭಾಷಾ ಅನುವಾದವನ್ನು ಪರಿವರ್ತಿಸುತ್ತಿದೆ.",
+      "lora_backtranslation": "ಕೃತಕ ಬುದ್ಧಿಮತ್ತೆಯು ಪ್ರಾದೇಶಿಕ ಭಾಷಾ ಅನುವಾದವನ್ನು ಪರಿವರ್ತಿಸುತ್ತಿದೆ."
+    },
+    "sentence_chrf": {
+      "baseline": 41.5,
+      "lora": 54.0,
+      "lora_backtranslation": 61.2
+    },
+    "qualitative_observation": "LoRA+BT accurately aligns case suffixes (vibhakti) and preserves formal Kannada domain terminology without hallucinating repeating tokens."
+  }
+]

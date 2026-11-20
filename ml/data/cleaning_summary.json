@@ -1,0 +1,16 @@
+{
+  "train_count": 16,
+  "val_count": 2,
+  "test_count": 2,
+  "stats": {
+    "total_input": 24,
+    "dropped_duplicates": 1,
+    "dropped_quality_filters": 3,
+    "reasons": {
+      "LOW_KANNADA_SCRIPT_PURITY (0.00 < 0.35)": 1,
+      "LENGTH_RATIO_OUT_OF_BOUNDS (ratio=0.07)": 1,
+      "EMPTY_TEXT": 1
+    },
+    "valid_retained": 20
+  }
+}

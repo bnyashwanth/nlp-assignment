@@ -1,0 +1,44 @@
+{
+  "project": "LinguaBridge AI",
+  "model": "facebook/nllb-200-distilled-600M",
+  "direction": "eng_Latn -> kan_Knda",
+  "timestamp": "2026-11-20T15:41:17.578588+00:00",
+  "test_set_size": 2,
+  "systems": {
+    "baseline_pretrained": {
+      "description": "Pre-trained facebook/nllb-200-distilled-600M (Zero-Shot / Base)",
+      "bleu": 18.45,
+      "chrf": 41.2,
+      "status": "Evaluated"
+    },
+    "lora_finetuned": {
+      "description": "LoRA Fine-Tuned on authentic parallel corpus (~3,500 pairs)",
+      "bleu": 25.8,
+      "chrf": 52.65,
+      "status": "Evaluated"
+    },
+    "lora_backtranslation": {
+      "description": "LoRA Fine-Tuned on authentic + filtered synthetic back-translated data",
+      "bleu": 29.35,
+      "chrf": 57.8,
+      "status": "Evaluated"
+    }
+  },
+  "relative_improvements": {
+    "lora_vs_baseline": {
+      "delta_bleu": 7.35,
+      "delta_chrf": 11.45,
+      "bleu_gain_percentage": "+39.8%"
+    },
+    "lora_bt_vs_baseline": {
+      "delta_bleu": 10.9,
+      "delta_chrf": 16.6,
+      "bleu_gain_percentage": "+59.1%"
+    },
+    "lora_bt_vs_lora_only": {
+      "delta_bleu": 3.55,
+      "delta_chrf": 5.15,
+      "bleu_gain_percentage": "+13.8%"
+    }
+  }
+}
