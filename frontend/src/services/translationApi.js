@@ -180,9 +180,14 @@ export async function translateText({
   }
 
   if (!API_BASE_URL) {
-    throw new Error(
-      'Cloud backend is not configured. Deploy the FastAPI backend and set VITE_API_BASE_URL, or download both offline model packs over Wi-Fi.'
-    );
+    if (isOfflineTranslationSupported()) {
+      return await translateOffline({
+        text: trimmed,
+        sourceLang: source_lang,
+        targetLang: target_lang,
+      });
+    }
+    throw new Error('Cloud backend is not configured. Deploy the FastAPI backend and set VITE_API_BASE_URL.');
   }
 
   // -------------------------------------------------------------------------

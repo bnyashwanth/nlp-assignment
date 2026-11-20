@@ -37,6 +37,7 @@ export function useTranslation() {
   const [translationMode, setTranslationMode] = useState('online'); // 'online' | 'offline'
   const [translationEngine, setTranslationEngine] = useState('Online Backend (NLLB/LoRA)');
   const [isFallback, setIsFallback] = useState(false);
+  const [isLocalFallback, setIsLocalFallback] = useState(false);
   const [latency, setLatency] = useState(null);
 
   // UI Loading & Error States
@@ -106,6 +107,7 @@ export function useTranslation() {
     setError(null);
     setComparisonData(null);
     setIsFallback(false);
+    setIsLocalFallback(false);
   }, []);
 
   /**
@@ -135,6 +137,7 @@ export function useTranslation() {
       setTranslationMode(response.mode || (isConnected ? 'online' : 'offline'));
       setTranslationEngine(response.engine || (isConnected ? 'Online Backend (NLLB/LoRA)' : 'Offline On-Device Model'));
       setIsFallback(Boolean(response.isFallback));
+      setIsLocalFallback(Boolean(response.isLocalFallback));
 
       // Append to history with mode metadata
       const newHistoryItem = {
@@ -148,6 +151,7 @@ export function useTranslation() {
         latencyMs: response.latency_ms,
         translationMode: response.mode || (isConnected ? 'online' : 'offline'),
         translationEngine: response.engine || (isConnected ? 'Online Backend (NLLB/LoRA)' : 'Offline On-Device Model'),
+        isLocalFallback: Boolean(response.isLocalFallback),
       };
 
       setHistory((prev) => [newHistoryItem, ...prev.slice(0, MAX_HISTORY_ITEMS - 1)]);
@@ -213,6 +217,7 @@ export function useTranslation() {
     setLatency(item.latencyMs);
     setTranslationMode(item.translationMode || 'online');
     setTranslationEngine(item.translationEngine || 'Online Backend (NLLB/LoRA)');
+    setIsLocalFallback(Boolean(item.isLocalFallback));
     setShowHistoryModal(false);
   }, []);
 
@@ -236,6 +241,7 @@ export function useTranslation() {
     translationMode,
     translationEngine,
     isFallback,
+    isLocalFallback,
     latency,
 
     // Processing & Errors

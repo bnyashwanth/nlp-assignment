@@ -18,6 +18,7 @@
 
 import { Capacitor } from '@capacitor/core';
 import { Translation, Language } from '@capacitor-mlkit/translation';
+import { translateLocally } from './localOfflineFallback';
 
 export { Language };
 
@@ -119,16 +120,27 @@ export async function downloadModel({ language }) {
 
   const mlKitLang = mapCodeToMlKitLanguage(language);
   const langLabel = getLanguageLabel(mlKitLang);
+  let timeoutId;
 
   try {
     console.info(`[OfflineTranslation] Initiating download for ${langLabel} (${mlKitLang})...`);
-    await Translation.downloadModel({ language: mlKitLang });
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => {
+        reject(new Error(`Download timed out after 25 seconds for ${langLabel}. Connect to Wi-Fi and retry.`));
+      }, 25000);
+    });
+    await Promise.race([
+      Translation.downloadModel({ language: mlKitLang }),
+      timeoutPromise,
+    ]);
     console.info(`[OfflineTranslation] Successfully downloaded ${langLabel} model pack.`);
   } catch (err) {
     console.error(`[OfflineTranslation] Download failed for ${langLabel}:`, err);
     throw new Error(
       `Failed to download ${langLabel} language model: ${err.message || 'Check your internet connection and try again.'}`
     );
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
   }
 }
 
@@ -216,37 +228,61 @@ export async function translateOffline({ text, sourceLang, targetLang }) {
     const missing = [];
     if (!hasSource) missing.push(srcLabel);
     if (!hasTarget) missing.push(tgtLabel);
+    console.warn(`[OfflineTranslation] Missing ML Kit packs: ${missing.join(', ')}`);
+  } else {
+    // 3. Try ML Kit first, with a bounded timeout.
+    try {
+      const startTime = performance.now();
+      let timeoutId;
+      const timeoutPromise = new Promise((_, reject) => {
+        timeoutId = setTimeout(
+          () => reject(new Error('ML Kit translation timed out after 8 seconds')),
+          8000
+        );
+      });
 
-    throw new Error(
-      `The offline language pack for ${missing.join(' and ')} is not downloaded. ` +
-      `Please connect to the internet and download the model pack from the Offline Models manager before translating offline.`
-    );
+      let result;
+      try {
+        result = await Promise.race([
+          Translation.translate({
+            text: trimmedText,
+            sourceLanguage,
+            targetLanguage,
+          }),
+          timeoutPromise,
+        ]);
+      } finally {
+        clearTimeout(timeoutId);
+      }
+
+      return {
+        source_text: trimmedText,
+        translated_text: result.text,
+        source_lang: sourceLang,
+        target_lang: targetLang,
+        model_variant: 'mlkit_offline',
+        latency_ms: Math.round(performance.now() - startTime),
+        mode: 'offline',
+        engine: 'ML Kit On-Device Model',
+        isLocalFallback: false,
+      };
+    } catch (err) {
+      console.warn('[OfflineTranslation] ML Kit translation failed; using bundled fallback:', err);
+    }
   }
 
-  // 3. Execute translation on-device
-  try {
-    const startTime = performance.now();
-    const result = await Translation.translate({
-      text: trimmedText,
-      sourceLanguage,
-      targetLanguage,
-    });
-    const latencyMs = Math.round(performance.now() - startTime);
-
-    return {
-      source_text: trimmedText,
-      translated_text: result.text,
-      source_lang: sourceLang,
-      target_lang: targetLang,
-      model_variant: 'mlkit_offline',
-      latency_ms: latencyMs,
-      mode: 'offline',
-      engine: 'Offline On-Device Model',
-    };
-  } catch (err) {
-    console.error('[OfflineTranslation] Translation execution error:', err);
-    throw new Error(
-      `On-device translation error: ${err.message || 'Failed to translate using local model.'}`
-    );
-  }
+  // 4. Final on-device fallback: no network calls and no dead-end failure.
+  const startTime = performance.now();
+  const local = translateLocally(trimmedText, sourceLang, targetLang);
+  return {
+    source_text: trimmedText,
+    translated_text: local.translatedText,
+    source_lang: sourceLang,
+    target_lang: targetLang,
+    model_variant: 'local_dictionary',
+    latency_ms: Math.round(performance.now() - startTime),
+    mode: 'offline',
+    engine: 'Local Offline Fallback',
+    isLocalFallback: true,
+  };
 }

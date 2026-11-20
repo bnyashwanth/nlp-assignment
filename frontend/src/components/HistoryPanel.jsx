@@ -91,7 +91,7 @@ export default function HistoryPanel({
                     {item.translationMode === 'offline' ? (
                       <span className="inline-flex items-center space-x-1 text-[11px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-300">
                         <Smartphone className="w-3 h-3 text-amber-600" />
-                        <span>Offline On-Device</span>
+                        <span>{item.isLocalFallback ? 'Local Offline Fallback' : 'ML Kit On-Device'}</span>
                       </span>
                     ) : (
                       <span className="inline-flex items-center space-x-1 text-[11px] font-semibold text-blue-800 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">

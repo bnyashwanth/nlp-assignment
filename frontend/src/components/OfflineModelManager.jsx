@@ -60,6 +60,7 @@ export default function OfflineModelManager({ isOpen, onClose, isInline = false 
   const [isChecking, setIsChecking] = useState(false);
   const [activeOperations, setActiveOperations] = useState({}); // { [langCode]: 'downloading' | 'deleting' }
   const [feedback, setFeedback] = useState(null); // { type: 'success' | 'error' | 'info', message: string }
+  const [retryLanguage, setRetryLanguage] = useState(null);
 
   const isNative = isOfflineTranslationSupported();
 
@@ -121,6 +122,7 @@ export default function OfflineModelManager({ isOpen, onClose, isInline = false 
     }
 
     setActiveOperations((prev) => ({ ...prev, [langCode]: 'downloading' }));
+    setRetryLanguage(null);
     setFeedback({
       type: 'info',
       message: `Downloading ${langName} offline model pack (~30MB). Connect to Wi-Fi and keep the app open...`,
@@ -140,6 +142,7 @@ export default function OfflineModelManager({ isOpen, onClose, isInline = false 
         type: 'error',
         message: err.message || `Failed to download ${langName} model pack.`,
       });
+      setRetryLanguage({ code: langCode, name: langName });
     } finally {
       setActiveOperations((prev) => {
         const next = { ...prev };
@@ -249,12 +252,23 @@ export default function OfflineModelManager({ isOpen, onClose, isInline = false 
             )}
             <span className="font-medium">{feedback.message}</span>
           </div>
-          <button
-            onClick={() => setFeedback(null)}
-            className="text-slate-400 hover:text-slate-600 p-0.5 ml-2"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex items-center space-x-2 ml-2">
+            {feedback.type === 'error' && retryLanguage && (
+              <button
+                type="button"
+                onClick={() => handleDownload(retryLanguage.code, retryLanguage.name)}
+                className="px-2.5 py-1 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold"
+              >
+                Retry
+              </button>
+            )}
+            <button
+              onClick={() => setFeedback(null)}
+              className="text-slate-400 hover:text-slate-600 p-0.5"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       )}
 

@@ -54,6 +54,7 @@ export default function App() {
     translationMode,
     translationEngine,
     isFallback,
+    isLocalFallback,
     latency,
 
     // Loading & Errors
@@ -214,6 +215,7 @@ export default function App() {
             translationMode={translationMode}
             translationEngine={translationEngine}
             isFallback={isFallback}
+            isLocalFallback={isLocalFallback}
           />
 
         </div>

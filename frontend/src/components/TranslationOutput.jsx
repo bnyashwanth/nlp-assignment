@@ -31,6 +31,7 @@ export default function TranslationOutput({
   translationMode,
   translationEngine,
   isFallback = false,
+  isLocalFallback = false,
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -53,7 +54,9 @@ export default function TranslationOutput({
    */
   const getModelLabel = () => {
     if (translationMode === 'offline') {
-      return 'Google ML Kit (On-Device Neural Model)';
+      return isLocalFallback
+        ? 'Bundled Local Phrase Dictionary'
+        : 'Google ML Kit (On-Device Neural Model)';
     }
     switch (modelVariant) {
       case 'lora_bt':
@@ -82,7 +85,7 @@ export default function TranslationOutput({
             translationMode === 'offline' ? (
               <span className="inline-flex items-center space-x-1 text-xs font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-300 shadow-xs animate-fadeIn">
                 <Smartphone className="w-3.5 h-3.5 text-amber-600" />
-                <span>Offline On-Device Model</span>
+                <span>{isLocalFallback ? 'Local Offline Fallback' : 'ML Kit On-Device Model'}</span>
                 {isFallback && (
                   <span className="ml-1 text-[10px] text-amber-600 font-semibold">(Fallback)</span>
                 )}
