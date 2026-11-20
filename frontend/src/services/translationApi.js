@@ -21,7 +21,7 @@ import {
 } from './offlineTranslation';
 
 // Read base URL from Vite environment variable with sensible default
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:7860').replace(/\/+$/, '');
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
 
 console.info(`[LinguaBridge API] Configured Base URL: ${API_BASE_URL}`);
 
@@ -177,6 +177,12 @@ export async function translateText({
       sourceLang: source_lang,
       targetLang: target_lang,
     });
+  }
+
+  if (!API_BASE_URL) {
+    throw new Error(
+      'Cloud backend is not configured. Deploy the FastAPI backend and set VITE_API_BASE_URL, or download both offline model packs over Wi-Fi.'
+    );
   }
 
   // -------------------------------------------------------------------------

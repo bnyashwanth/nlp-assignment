@@ -123,7 +123,7 @@ export default function OfflineModelManager({ isOpen, onClose, isInline = false 
     setActiveOperations((prev) => ({ ...prev, [langCode]: 'downloading' }));
     setFeedback({
       type: 'info',
-      message: `Downloading ${langName} offline model pack (~30MB). This may take a moment...`,
+      message: `Downloading ${langName} offline model pack (~30MB). Connect to Wi-Fi and keep the app open...`,
     });
 
     try {
