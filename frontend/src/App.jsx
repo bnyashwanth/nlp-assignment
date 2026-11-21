@@ -14,7 +14,7 @@ export default function App() {
     <div className="app-shell">
       <header className="top-nav">
         <button className="brand" type="button" onClick={() => setActiveView('home')}>
-          <span className="brand-mark" aria-hidden="true">S</span>
+          <img className="brand-mark" src="/setu-icon.svg" alt="" aria-hidden="true" />
           <span>Setu</span>
         </button>
         <nav aria-label="Primary navigation">

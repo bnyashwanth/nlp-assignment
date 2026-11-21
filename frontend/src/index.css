@@ -31,7 +31,7 @@ button { cursor: pointer; }
   backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 20;
 }
 .brand { display: flex; align-items: center; gap: 10px; border: 0; background: none; color: var(--ink); font-weight: 750; }
-.brand-mark { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: white; font-family: Georgia, serif; font-size: 11px; }
+.brand-mark { width: 34px; height: 34px; border-radius: 9px; display: block; }
 .top-nav nav { display: flex; gap: 28px; }
 .top-nav nav button { border: 0; background: none; color: #777; padding: 8px 0; }
 .top-nav nav button.active { color: var(--ink); font-weight: 700; border-bottom: 1px solid var(--ink); }
