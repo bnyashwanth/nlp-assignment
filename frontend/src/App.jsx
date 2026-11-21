@@ -25,8 +25,32 @@ export default function App() {
 
       {activeView === 'home' && (
         <main className="home-view">
-          <div className="script-glyphs" aria-hidden="true">
-            <span>ಕ</span><span>ह</span><span>த</span><span>తె</span>
+          <div className="home-art" aria-hidden="true">
+            <div className="orbital-globe">
+              <span className="orbit orbit-one" />
+              <span className="orbit orbit-two" />
+              <span className="orbit orbit-three" />
+              <span className="globe-core" />
+            </div>
+
+            <div className="glyph glyph-a">A</div>
+            <div className="glyph glyph-kn">ಅ</div>
+            <div className="glyph glyph-hi">अ</div>
+            <div className="glyph glyph-ta">அ</div>
+            <div className="glyph glyph-te">అ</div>
+
+            <div className="glass-sphere sphere-one" />
+            <div className="glass-sphere sphere-two" />
+            <div className="glass-sphere sphere-three" />
+            <div className="glass-sphere sphere-four" />
+            <div className="glass-sphere sphere-five" />
+
+            <svg className="ribbon ribbon-left" viewBox="0 0 500 260" fill="none">
+              <path d="M-30 215C74 205 83 92 183 116C286 140 275 238 414 125C457 90 486 65 530 42" />
+            </svg>
+            <svg className="ribbon ribbon-right" viewBox="0 0 620 300" fill="none">
+              <path d="M-20 258C88 220 79 126 181 96C310 58 342 232 470 208C544 194 590 116 650 52" />
+            </svg>
           </div>
           <section className="hero">
             <span className="language-pill">{LANGUAGES}</span>
