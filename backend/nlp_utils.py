@@ -35,10 +35,14 @@ from typing import Dict, List, Optional, Set, Tuple
 # Unicode codepoint blocks
 KANNADA_RANGE = (0x0C80, 0x0CFF)
 DEVANAGARI_RANGE = (0x0900, 0x097F)
+TAMIL_RANGE = (0x0B80, 0x0BFF)
+TELUGU_RANGE = (0x0C00, 0x0C7F)
 LATIN_RANGE = (0x0041, 0x007A)  # A-Z, a-z + basic Latin
 
 KANNADA_PATTERN = re.compile(r"[\u0C80-\u0CFF]")
 DEVANAGARI_PATTERN = re.compile(r"[\u0900-\u097F]")
+TAMIL_PATTERN = re.compile(r"[\u0B80-\u0BFF]")
+TELUGU_PATTERN = re.compile(r"[\u0C00-\u0C7F]")
 LATIN_PATTERN = re.compile(r"[a-zA-Z]")
 PUNCTUATION_PATTERN = re.compile(r"[!\"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~।॥]")
 
@@ -59,6 +63,16 @@ LANG_CODE_MAP = {
     "hin": "hin_Deva",
     "hin_deva": "hin_Deva",
     "hindi": "hin_Deva",
+    # Tamil
+    "ta": "tam_Taml",
+    "tam": "tam_Taml",
+    "tam_taml": "tam_Taml",
+    "tamil": "tam_Taml",
+    # Telugu
+    "te": "tel_Telu",
+    "tel": "tel_Telu",
+    "tel_telu": "tel_Telu",
+    "telugu": "tel_Telu",
 }
 
 # Reverse mapping to ISO 639-1
@@ -66,6 +80,8 @@ ISO_MAP = {
     "eng_Latn": "en",
     "kan_Knda": "kn",
     "hin_Deva": "hi",
+    "tam_Taml": "ta",
+    "tel_Telu": "te",
 }
 
 # Common English and Indic stopwords for light filtration
@@ -73,6 +89,8 @@ STOPWORDS: Dict[str, Set[str]] = {
     "en": {"the", "a", "an", "in", "is", "of", "and", "to", "for", "with", "on", "at", "by", "this", "that"},
     "kn": {"ಮತ್ತು", "ಇದು", "ಅದು", "ಈ", "ಆ", "ಎಂದು", "ಒಂದು", "ಮೇಲೆ", "ರಲ್ಲಿ", "ಇದೆ", "ಆಗಿದೆ"},
     "hi": {"और", "यह", "वह", "का", "की", "के", "में", "पर", "है", "हैं", "से", "को"},
+    "ta": {"மற்றும்", "இது", "அது", "ஒரு", "என்று", "இல்லை", "ஆகும்", "உள்ளது", "இந்த", "அந்த"},
+    "te": {"మరియు", "ఇది", "అది", "ఒక", "అని", "లేదు", "ఉంది", "ఈ", "ఆ", "గా"},
 }
 
 
@@ -138,12 +156,15 @@ def remove_punctuation(text: str) -> str:
 
 def tokenize_words(text: str) -> List[str]:
     """
-    Performs word-level tokenization suitable for multilingual text (English, Kannada, Hindi).
-    Preserves Indic characters, vowels, and virama sequences.
+    Performs word-level tokenization suitable for multilingual text (English, Kannada, Hindi, Tamil, Telugu).
+    Preserves Indic characters, vowels, pulli (U+0BCD in Tamil), and virama sequences.
     """
     cleaned = normalize_text(text)
     # Match alphanumeric words or contiguous Indic script sequences
-    tokens = re.findall(r"[\u0C80-\u0CFF]+|[\u0900-\u097F]+|[a-zA-Z0-9]+|[^\s\w]", cleaned)
+    tokens = re.findall(
+        r"[\u0C80-\u0CFF]+|[\u0900-\u097F]+|[\u0B80-\u0BFF]+|[\u0C00-\u0C7F]+|[a-zA-Z0-9]+|[^\s\w]",
+        cleaned,
+    )
     return [t for t in tokens if t.strip()]
 
 
@@ -177,28 +198,33 @@ def get_character_ngrams(text: str, n: int = 3) -> List[str]:
 
 def analyze_script_proportions(text: str) -> Dict[str, float]:
     """
-    Computes character script distribution ratios for Latin, Kannada, and Devanagari.
+    Computes character script distribution ratios for Latin, Kannada, Devanagari, Tamil, and Telugu.
     """
     non_space = [c for c in text if not c.isspace()]
     if not non_space:
-        return {"latin": 0.0, "kannada": 0.0, "devanagari": 0.0, "total": 0}
+        return {"latin": 0.0, "kannada": 0.0, "devanagari": 0.0, "tamil": 0.0, "telugu": 0.0, "total": 0}
 
     total = len(non_space)
     latin_count = len(LATIN_PATTERN.findall("".join(non_space)))
     kannada_count = len(KANNADA_PATTERN.findall("".join(non_space)))
     deva_count = len(DEVANAGARI_PATTERN.findall("".join(non_space)))
+    tamil_count = len(TAMIL_PATTERN.findall("".join(non_space)))
+    telugu_count = len(TELUGU_PATTERN.findall("".join(non_space)))
 
     return {
         "latin": round(latin_count / total, 3),
         "kannada": round(kannada_count / total, 3),
         "devanagari": round(deva_count / total, 3),
+        "tamil": round(tamil_count / total, 3),
+        "telugu": round(telugu_count / total, 3),
         "total": total,
     }
 
 
 def detect_dominant_script(text: str) -> str:
     """
-    Detects the dominant script in the given text: 'eng_Latn', 'kan_Knda', 'hin_Deva', or 'unknown'.
+    Detects the dominant script in the given text:
+    'eng_Latn', 'kan_Knda', 'hin_Deva', 'tam_Taml', 'tel_Telu', or 'unknown'.
     """
     ratios = analyze_script_proportions(text)
     if ratios["total"] == 0:
@@ -207,6 +233,10 @@ def detect_dominant_script(text: str) -> str:
         return "kan_Knda"
     if ratios["devanagari"] >= 0.25:
         return "hin_Deva"
+    if ratios["tamil"] >= 0.25:
+        return "tam_Taml"
+    if ratios["telugu"] >= 0.25:
+        return "tel_Telu"
     if ratios["latin"] >= 0.30:
         return "eng_Latn"
     return "unknown"
@@ -229,11 +259,21 @@ def validate_script_match(text: str, expected_lang: str) -> Tuple[bool, str]:
     elif norm_lang == "hin_Deva":
         if ratios["devanagari"] < 0.20 and ratios["latin"] > 0.60:
             return False, "Expected Hindi (Devanagari) script, but text appears to be primarily English/Latin."
+    elif norm_lang == "tam_Taml":
+        if ratios["tamil"] < 0.20 and ratios["latin"] > 0.60:
+            return False, "Expected Tamil script, but text appears to be primarily English/Latin."
+    elif norm_lang == "tel_Telu":
+        if ratios["telugu"] < 0.20 and ratios["latin"] > 0.60:
+            return False, "Expected Telugu script, but text appears to be primarily English/Latin."
     elif norm_lang == "eng_Latn":
         if ratios["kannada"] > 0.40:
             return False, "Expected English text, but found predominantly Kannada characters."
         if ratios["devanagari"] > 0.40:
             return False, "Expected English text, but found predominantly Hindi (Devanagari) characters."
+        if ratios["tamil"] > 0.40:
+            return False, "Expected English text, but found predominantly Tamil characters."
+        if ratios["telugu"] > 0.40:
+            return False, "Expected English text, but found predominantly Telugu characters."
 
     return True, "Valid"
 

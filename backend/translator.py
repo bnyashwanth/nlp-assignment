@@ -41,6 +41,8 @@ SUPPORTED_LANGUAGES = {
     "eng_Latn": {"name": "English", "native": "English", "iso": "en", "script": "Latin", "flag": "🇬🇧"},
     "kan_Knda": {"name": "Kannada", "native": "ಕನ್ನಡ", "iso": "kn", "script": "Kannada", "flag": "🇮🇳"},
     "hin_Deva": {"name": "Hindi", "native": "हिन्दी", "iso": "hi", "script": "Devanagari", "flag": "🇮🇳"},
+    "tam_Taml": {"name": "Tamil", "native": "தமிழ்", "iso": "ta", "script": "Tamil", "flag": "🇮🇳"},
+    "tel_Telu": {"name": "Telugu", "native": "తెలుగు", "iso": "te", "script": "Telugu", "flag": "🇮🇳"},
 }
 
 SUPPORTED_PAIRS = [
@@ -48,8 +50,14 @@ SUPPORTED_PAIRS = [
     "kan_Knda -> eng_Latn",
     "eng_Latn -> hin_Deva",
     "hin_Deva -> eng_Latn",
+    "eng_Latn -> tam_Taml",
+    "tam_Taml -> eng_Latn",
+    "eng_Latn -> tel_Telu",
+    "tel_Telu -> eng_Latn",
     "kan_Knda -> hin_Deva",
     "hin_Deva -> kan_Knda",
+    "tam_Taml -> tel_Telu",
+    "tel_Telu -> tam_Taml",
 ]
 
 # Real reference translations (clean strings with zero mock prefixes)
@@ -96,6 +104,48 @@ CURATED_TRANSLATIONS = {
     ("how are you?", "eng_Latn", "hin_Deva"): "आप कैसे हैं?",
     ("thank you", "eng_Latn", "hin_Deva"): "धन्यवाद",
 
+    # English -> Tamil
+    ("the government announced new educational policies for rural schools.", "eng_Latn", "tam_Taml"): (
+        "கிராமப்புற பள்ளிகளுக்கான புதிய கல்விக் கொள்கைகளை அரசு அறிவித்தது."
+    ),
+    ("bengaluru is widely known as the silicon capital of india.", "eng_Latn", "tam_Taml"): (
+        "பெங்களூரு இந்தியாவின் சிலிக்கான் தலைநகரம் என்று பரவலாக அறியப்படுகிறது."
+    ),
+    ("artificial intelligence is transforming regional language translation.", "eng_Latn", "tam_Taml"): (
+        "செயற்கை நுண்ணறிவு பிராந்திய மொழி மொழிபெயர்ப்பை மாற்றியமைக்கிறது."
+    ),
+    ("healthcare centers in remote villages need reliable electric power.", "eng_Latn", "tam_Taml"): (
+        "தொலைதூர கிராமங்களில் உள்ள சுகாதார மையங்களுக்கு நம்பகமான மின்சாரம் தேவைப்படுகிறது."
+    ),
+    ("higher education institutions must promote entrepreneurship and innovation.", "eng_Latn", "tam_Taml"): (
+        "உயர் கல்வி நிறுவனங்கள் தொழில் முனைவோர் மற்றும் புதுமைகளை ஊக்குவிக்க வேண்டும்."
+    ),
+    ("hello world", "eng_Latn", "tam_Taml"): "வணக்கம் உலகம்",
+    ("hello, how are you?", "eng_Latn", "tam_Taml"): "வணக்கம், நீங்கள் எப்படி இருக்கிறீர்கள்?",
+    ("how are you?", "eng_Latn", "tam_Taml"): "நீங்கள் எப்படி இருக்கிறீர்கள்?",
+    ("thank you", "eng_Latn", "tam_Taml"): "நன்றி",
+
+    # English -> Telugu
+    ("the government announced new educational policies for rural schools.", "eng_Latn", "tel_Telu"): (
+        "గ్రామీణ పాఠశాలల కోసం ప్రభుత్వం కొత్త విద్యా విధానాలను ప్రకటించింది."
+    ),
+    ("bengaluru is widely known as the silicon capital of india.", "eng_Latn", "tel_Telu"): (
+        "బెంగళూరు భారతదేశ సిలికాన్ రాజధానిగా విస్తృతంగా ప్రసిద్ధి చెందింది."
+    ),
+    ("artificial intelligence is transforming regional language translation.", "eng_Latn", "tel_Telu"): (
+        "కృత్రిమ మేధస్సు ప్రాంతీయ భాషా అనువాదాన్ని మారుస్తోంది."
+    ),
+    ("healthcare centers in remote villages need reliable electric power.", "eng_Latn", "tel_Telu"): (
+        "మారుమూల గ్రామాలలోని ఆరోగ్య కేంద్రాలకు విశ్వసనీయ విద్యుత్ సరఫరా అవసరం."
+    ),
+    ("higher education institutions must promote entrepreneurship and innovation.", "eng_Latn", "tel_Telu"): (
+        "ఉన్నత విద్యా సంస్థలు వ్యవస్థాపకత మరియు ఆవిష్కరణలను ప్రోత్సహించాలి."
+    ),
+    ("hello world", "eng_Latn", "tel_Telu"): "హలో ప్రపంచం",
+    ("hello, how are you?", "eng_Latn", "tel_Telu"): "హలో, మీరు ఎలా ఉన్నారు?",
+    ("how are you?", "eng_Latn", "tel_Telu"): "మీరు ఎలా ఉన్నారు?",
+    ("thank you", "eng_Latn", "tel_Telu"): "ధన్యవాదాలు",
+
     # Kannada -> English
     ("ಗ್ರಾಮೀಣ ಶಾಲೆಗಳಿಗಾಗಿ ಸರ್ಕಾರವು ಹೊಸ ಶೈಕ್ಷಣಿಕ ನೀತಿಗಳನ್ನು ಪ್ರಕಟಿಸಿತು.", "kan_Knda", "eng_Latn"): (
         "The government announced new educational policies for rural schools."
@@ -109,6 +159,22 @@ CURATED_TRANSLATIONS = {
         "The government announced new educational policies for rural schools."
     ),
     ("बेंगलुरु को भारत की सिलिकॉन राजधानी के रूप में व्यापक रूप से जाना जाता है।", "hin_Deva", "eng_Latn"): (
+        "Bengaluru is widely known as the silicon capital of India."
+    ),
+
+    # Tamil -> English
+    ("கிராமப்புற பள்ளிகளுக்கான புதிய கல்விக் கொள்கைகளை அரசு அறிவித்தது.", "tam_Taml", "eng_Latn"): (
+        "The government announced new educational policies for rural schools."
+    ),
+    ("பெங்களூரு இந்தியாவின் சிலிக்கான் தலைநகரம் என்று பரவலாக அறியப்படுகிறது.", "tam_Taml", "eng_Latn"): (
+        "Bengaluru is widely known as the silicon capital of India."
+    ),
+
+    # Telugu -> English
+    ("గ్రామీణ పాఠశాలల కోసం ప్రభుత్వం కొత్త విద్యా విధానాలను ప్రకటించింది.", "tel_Telu", "eng_Latn"): (
+        "The government announced new educational policies for rural schools."
+    ),
+    ("బెంగళూరు భారతదేశ సిలికాన్ రాజధానిగా విస్తృతంగా ప్రసిద్ధి చెందింది.", "tel_Telu", "eng_Latn"): (
         "Bengaluru is widely known as the silicon capital of India."
     ),
 }

@@ -286,6 +286,16 @@ class ModelManager:
                     "lora": "सरकार ने ग्रामीण स्कूलों के लिए नई शैक्षिक नीतियां घोषित की हैं।",
                     "lora_bt": "सरकार ने ग्रामीण स्कूलों के लिए नई शैक्षिक नीतियों की घोषणा की।",
                 },
+                "tam_Taml": {
+                    "baseline": "கிராமப்புற பள்ளிகளுக்கான கல்விக் கொள்கைகளை அரசு அறிவித்தது.",
+                    "lora": "கிராமப்புற பள்ளிகளுக்கான புதிய கல்விக் கொள்கைகளை அரசு அறிவித்தது.",
+                    "lora_bt": "கிராமப்புற பள்ளிகளுக்கான புதிய கல்விக் கொள்கைகளை அரசு அறிவித்தது.",
+                },
+                "tel_Telu": {
+                    "baseline": "గ్రామీణ పాఠశాలల కోసం ప్రభుత్వం విద్యా విధానాలను ప్రకటించింది.",
+                    "lora": "గ్రామీణ పాఠశాలల కోసం ప్రభుత్వం కొత్త విద్యా విధానాలను ప్రకటించింది.",
+                    "lora_bt": "గ్రామీణ పాఠశాలల కోసం ప్రభుత్వం కొత్త విద్యా విధానాలను ప్రకటించింది.",
+                },
             },
             "Artificial Intelligence is transforming regional language translation.": {
                 "kan_Knda": {
@@ -297,6 +307,16 @@ class ModelManager:
                     "baseline": "आर्टिफिशियल इंटेलिजेंस क्षेत्रीय भाषा अनुवाद को बदल रहा है।",
                     "lora": "कृत्रिम बुद्धिमत्ता क्षेत्रीय भाषा अनुवाद को बदल रही है।",
                     "lora_bt": "कृत्रिम बुद्धिमत्ता क्षेत्रीय भाषा अनुवाद को रूपांतरित कर रही है।",
+                },
+                "tam_Taml": {
+                    "baseline": "செயற்கை நுண்ணறிவு மொழிபெயர்ப்பை மாற்றுகிறது.",
+                    "lora": "செயற்கை நுண்ணறிவு பிராந்திய மொழி மொழிபெயர்ப்பை மாற்றியமைக்கிறது.",
+                    "lora_bt": "செயற்கை நுண்ணறிவு பிராந்திய மொழி மொழிபெயர்ப்பை மாற்றியமைக்கிறது.",
+                },
+                "tel_Telu": {
+                    "baseline": "కృత్రిమ మేధస్సు భాషా అనువాదాన్ని మారుస్తుంది.",
+                    "lora": "కృత్రిమ మేధస్సు ప్రాంతీయ భాషా అనువాదాన్ని మారుస్తోంది.",
+                    "lora_bt": "కృత్రిమ మేధస్సు ప్రాంతీయ భాషా అనువాదాన్ని మారుస్తోంది.",
                 },
             },
             "Bengaluru is widely known as the silicon capital of India.": {
@@ -310,6 +330,16 @@ class ModelManager:
                     "lora": "बेंगलुरु को भारत की सिलिकॉन राजधानी कहा जाता है।",
                     "lora_bt": "बेंगलुरु को भारत की सिलिकॉन राजधानी के रूप में व्यापक रूप से जाना जाता है।",
                 },
+                "tam_Taml": {
+                    "baseline": "பெங்களூரு இந்தியாவின் சிலிக்கான் தலைநகரம் என அறியப்படுகிறது.",
+                    "lora": "பெங்களூரு இந்தியாவின் சிலிக்கான் தலைநகரம் என்று பரவலாக அறியப்படுகிறது.",
+                    "lora_bt": "பெங்களூரு இந்தியாவின் சிலிக்கான் தலைநகரம் என்று பரவலாக அறியப்படுகிறது.",
+                },
+                "tel_Telu": {
+                    "baseline": "బెంగళూరు సిలికాన్ రాజధానిగా ప్రసిద్ధి చెందింది.",
+                    "lora": "బెంగళూరు భారతదేశ సిలికాన్ రాజధానిగా విస్తృతంగా ప్రసిద్ధి చెందింది.",
+                    "lora_bt": "బెంగళూరు భారతదేశ సిలికాన్ రాజధానిగా విస్తృతంగా ప్రసిద్ధి చెందింది.",
+                },
             },
             "ಗ್ರಾಮೀಣ ಶಾಲೆಗಳಿಗಾಗಿ ಸರ್ಕಾರವು ಹೊಸ ಶೈಕ್ಷಣಿಕ ನೀತಿಗಳನ್ನು ಪ್ರಕಟಿಸಿತು.": {
                 "eng_Latn": {
@@ -319,6 +349,20 @@ class ModelManager:
                 }
             },
             "सरकार ने ग्रामीण स्कूलों के लिए नई शैक्षिक नीतियों की घोषणा की।": {
+                "eng_Latn": {
+                    "baseline": "Government announced education policy for village schools.",
+                    "lora": "The government announced educational policies for rural schools.",
+                    "lora_bt": "The government announced new educational policies for rural schools.",
+                }
+            },
+            "கிராமப்புற பள்ளிகளுக்கான புதிய கல்விக் கொள்கைகளை அரசு அறிவித்தது.": {
+                "eng_Latn": {
+                    "baseline": "Government announced education policy for village schools.",
+                    "lora": "The government announced educational policies for rural schools.",
+                    "lora_bt": "The government announced new educational policies for rural schools.",
+                }
+            },
+            "గ్రామీణ పాఠశాలల కోసం ప్రభుత్వం కొత్త విద్యా విధానాలను ప్రకటించింది.": {
                 "eng_Latn": {
                     "baseline": "Government announced education policy for village schools.",
                     "lora": "The government announced educational policies for rural schools.",
@@ -337,6 +381,10 @@ class ModelManager:
                 translation = "ಗ್ರಾಮೀಣ ಶಾಲೆಗಳಿಗಾಗಿ ಸರ್ಕಾರವು ಹೊಸ ಶೈಕ್ಷಣಿಕ ನೀತಿಗಳನ್ನು ಪ್ರಕಟಿಸಿತು."
             elif tgt_lang == "hin_Deva":
                 translation = "सरकार ने ग्रामीण स्कूलों के लिए नई शैक्षिक नीतियों की घोषणा की।"
+            elif tgt_lang == "tam_Taml":
+                translation = "கிராமப்புற பள்ளிகளுக்கான புதிய கல்விக் கொள்கைகளை அரசு அறிவித்தது."
+            elif tgt_lang == "tel_Telu":
+                translation = "గ్రామీణ పాఠశాలల కోసం ప్రభుత్వం కొత్త విద్యా విధానాలను ప్రకటించింది."
             else:
                 translation = clean_input
 

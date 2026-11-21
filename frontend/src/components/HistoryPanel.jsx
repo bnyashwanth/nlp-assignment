@@ -20,6 +20,17 @@ import {
   Zap,
 } from 'lucide-react';
 
+function formatLangLabel(code) {
+  if (!code) return 'UNK';
+  const prefix = code.split('_')[0].toUpperCase();
+  if (prefix === 'ENG' || prefix === 'EN') return 'ENG';
+  if (prefix === 'KAN' || prefix === 'KN') return 'KAN';
+  if (prefix === 'HIN' || prefix === 'HI') return 'HIN';
+  if (prefix === 'TAM' || prefix === 'TA') return 'TAM';
+  if (prefix === 'TEL' || prefix === 'TE') return 'TEL';
+  return prefix.slice(0, 3);
+}
+
 export default function HistoryPanel({
   isOpen,
   onClose,
@@ -82,9 +93,13 @@ export default function HistoryPanel({
                 {/* Meta row: languages, timestamp, and Mode Badge */}
                 <div className="flex items-center justify-between text-xs text-slate-400 flex-wrap gap-2">
                   <div className="flex items-center space-x-1.5 font-medium text-slate-500">
-                    <span className="uppercase font-mono">{item.sourceLang.split('_')[0]}</span>
-                    <ArrowRight className="w-3 h-3" />
-                    <span className="uppercase font-mono">{item.targetLang.split('_')[0]}</span>
+                    <span className="uppercase font-mono font-bold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded text-[10px]">
+                      {formatLangLabel(item.sourceLang)}
+                    </span>
+                    <ArrowRight className="w-3 h-3 text-slate-400" />
+                    <span className="uppercase font-mono font-bold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded text-[10px]">
+                      {formatLangLabel(item.targetLang)}
+                    </span>
                     <span className="text-slate-300">&bull;</span>
                     
                     {/* Mode Badge in History item */}

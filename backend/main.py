@@ -127,12 +127,14 @@ def get_health() -> HealthResponse:
     description="Returns available language codes (FLORES-200 and ISO), scripts, and pairs.",
 )
 def get_languages() -> LanguagesResponse:
-    """Lists supported language pairs (English <-> Kannada, English <-> Hindi)."""
+    """Lists supported language pairs (English, Kannada, Hindi, Tamil, Telugu)."""
     languages_list: List[LanguageItem] = []
     samples = {
         "eng_Latn": "The government announced new educational policies for rural schools.",
         "kan_Knda": "ಗ್ರಾಮೀಣ ಶಾಲೆಗಳಿಗಾಗಿ ಸರ್ಕಾರವು ಹೊಸ ಶೈಕ್ಷಣಿಕ ನೀತಿಗಳನ್ನು ಪ್ರಕಟಿಸಿತು.",
         "hin_Deva": "सरकार ने ग्रामीण स्कूलों के लिए नई शैक्षिक नीतियों की घोषणा की।",
+        "tam_Taml": "கிராமப்புற பள்ளிகளுக்கான புதிய கல்விக் கொள்கைகளை அரசு அறிவித்தது.",
+        "tel_Telu": "గ్రామీణ పాఠశాలల కోసం ప్రభుత్వం కొత్త విద్యా విధానాలను ప్రకటించింది.",
     }
 
     for code, info in SUPPORTED_LANGUAGES.items():

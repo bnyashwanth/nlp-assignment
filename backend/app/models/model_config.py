@@ -98,6 +98,18 @@ class AppConfig(BaseSettings):
             "native_name": "हिन्दी",
             "sample": "सरकार ने ग्रामीण स्कूलों के लिए नई शैक्षिक नीतियों की घोषणा की।",
         },
+        "tam_Taml": {
+            "name": "Tamil",
+            "script": "Tamil",
+            "native_name": "தமிழ்",
+            "sample": "கிராமப்புற பள்ளிகளுக்கான புதிய கல்விக் கொள்கைகளை அரசு அறிவித்தது.",
+        },
+        "tel_Telu": {
+            "name": "Telugu",
+            "script": "Telugu",
+            "native_name": "తెలుగు",
+            "sample": "గ్రామీణ పాఠశాలల కోసం ప్రభుత్వం కొత్త విద్యా విధానాలను ప్రకటించింది.",
+        },
     }
 
     # Supported Translation Directions
@@ -106,6 +118,10 @@ class AppConfig(BaseSettings):
         "kan_Knda -> eng_Latn",
         "eng_Latn -> hin_Deva",
         "hin_Deva -> eng_Latn",
+        "eng_Latn -> tam_Taml",
+        "tam_Taml -> eng_Latn",
+        "eng_Latn -> tel_Telu",
+        "tel_Telu -> eng_Latn",
     ]
 
     class Config:

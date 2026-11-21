@@ -60,6 +60,22 @@ const MANAGED_LANGUAGES = [
     description: 'Hindi Devanagari model pack for on-device inference',
     sizeEstimate: '~30 MB',
   },
+  {
+    code: Language.Tamil || 'ta', // 'ta'
+    name: 'Tamil',
+    nativeName: 'தமிழ்',
+    flag: '🇮🇳',
+    description: 'Tamil regional model pack for on-device inference',
+    sizeEstimate: '~30 MB',
+  },
+  {
+    code: Language.Telugu || 'te', // 'te'
+    name: 'Telugu',
+    nativeName: 'తెలుగు',
+    flag: '🇮🇳',
+    description: 'Telugu regional model pack for on-device inference',
+    sizeEstimate: '~30 MB',
+  },
 ];
 
 export default function OfflineModelManager({ isOpen, onClose, isInline = false }) {

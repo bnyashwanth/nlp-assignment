@@ -38,14 +38,24 @@ export function isOfflineTranslationSupported() {
 }
 
 /**
- * Maps incoming language codes to ML Kit Language enum ('en', 'kn', 'hi').
+ * Maps incoming language codes to ML Kit Language enum ('en', 'kn', 'hi', 'ta', 'te').
  * 
- * @param {string} code - Language code, e.g. 'eng_Latn', 'kan_Knda', 'hin_Deva', 'en', 'kn', 'hi'
+ * @param {string} code - Language code, e.g. 'eng_Latn', 'kan_Knda', 'hin_Deva', 'tam_Taml', 'tel_Telu'
  * @returns {string} ML Kit Language string
  */
 export function mapCodeToMlKitLanguage(code) {
   if (!code) return Language.English;
   const normalized = String(code).toLowerCase().trim();
+
+  // Match Tamil
+  if (normalized.startsWith('tam') || normalized === 'ta' || normalized.includes('taml')) {
+    return Language.Tamil || 'ta';
+  }
+
+  // Match Telugu
+  if (normalized.startsWith('tel') || normalized === 'te' || normalized.includes('telu')) {
+    return Language.Telugu || 'te';
+  }
 
   // Match Hindi
   if (normalized.startsWith('hin') || normalized === 'hi' || normalized.includes('deva')) {
@@ -75,6 +85,12 @@ export function mapCodeToMlKitLanguage(code) {
  */
 export function getLanguageLabel(language) {
   const norm = String(language).toLowerCase();
+  if (norm === (Language.Tamil || 'ta') || norm === 'ta' || norm.includes('tam')) {
+    return 'Tamil';
+  }
+  if (norm === (Language.Telugu || 'te') || norm === 'te' || norm.includes('tel')) {
+    return 'Telugu';
+  }
   if (norm === Language.Hindi || norm === 'hi' || norm.includes('hin')) {
     return 'Hindi';
   }

@@ -27,21 +27,29 @@ def run_tests():
     sample_en = "The government announced new educational policies for rural schools."
     sample_kn = "ಗ್ರಾಮೀಣ ಶಾಲೆಗಳಿಗಾಗಿ ಸರ್ಕಾರವು ಹೊಸ ಶೈಕ್ಷಣಿಕ ನೀತಿಗಳನ್ನು ಪ್ರಕಟಿಸಿತು."
     sample_hi = "सरकार ने ग्रामीण स्कूलों के लिए नई शैक्षिक नीतियों की घोषणा की।"
+    sample_ta = "கிராமப்புற பள்ளிகளுக்கான புதிய கல்விக் கொள்கைகளை அரசு அறிவித்தது."
+    sample_te = "గ్రామీణ పాఠశాలల కోసం ప్రభుత్వం కొత్త విద్యా విధానాలను ప్రకటించింది."
 
     norm_kn = nlp_utils.normalize_text(sample_kn)
     tokens_kn = nlp_utils.tokenize_words(norm_kn)
     tokens_hi = nlp_utils.tokenize_words(sample_hi)
+    tokens_ta = nlp_utils.tokenize_words(sample_ta)
+    tokens_te = nlp_utils.tokenize_words(sample_te)
     tokens_en = nlp_utils.tokenize_words(sample_en)
 
-    print(f"  ✓ English Word Tokens: {tokens_en[:5]}...")
+    print(f"  ✓ English Word Tokens: {tokens_en[:4]}...")
     print(f"  ✓ Kannada Word Tokens: {tokens_kn[:4]}...")
-    print(f"  ✓ Hindi Word Tokens: {tokens_hi[:4]}...")
+    print(f"  ✓ Hindi Word Tokens  : {tokens_hi[:4]}...")
+    print(f"  ✓ Tamil Word Tokens  : {tokens_ta[:4]}...")
+    print(f"  ✓ Telugu Word Tokens : {tokens_te[:4]}...")
 
     valid_kn, _ = nlp_utils.validate_script_match(sample_kn, "kan_Knda")
     valid_hi, _ = nlp_utils.validate_script_match(sample_hi, "hin_Deva")
+    valid_ta, _ = nlp_utils.validate_script_match(sample_ta, "tam_Taml")
+    valid_te, _ = nlp_utils.validate_script_match(sample_te, "tel_Telu")
     valid_en, _ = nlp_utils.validate_script_match(sample_en, "eng_Latn")
-    assert valid_kn and valid_hi and valid_en, "Script validations must pass"
-    print("  ✓ Script validation confirmed for English, Kannada, and Hindi")
+    assert valid_kn and valid_hi and valid_ta and valid_te and valid_en, "Script validations must pass"
+    print("  ✓ Script validation confirmed for English, Kannada, Hindi, Tamil, and Telugu")
 
     edit_dist = nlp_utils.levenshtein_distance("school", "schools")
     sim = nlp_utils.string_similarity_ratio("school", "schools")
@@ -51,7 +59,7 @@ def run_tests():
     # -------------------------------------------------------------------------
     # 2. Languages Catalog
     # -------------------------------------------------------------------------
-    print("\n[Test 2] GET /api/languages (English, Kannada, Hindi)...")
+    print("\n[Test 2] GET /api/languages (English, Kannada, Hindi, Tamil, Telugu)...")
     langs = translation_service.get_supported_languages()
     lang_codes = [l.code for l in langs.languages]
     print(f"  ✓ Supported languages: {lang_codes}")
@@ -59,6 +67,8 @@ def run_tests():
     assert "eng_Latn" in lang_codes
     assert "kan_Knda" in lang_codes
     assert "hin_Deva" in lang_codes
+    assert "tam_Taml" in lang_codes
+    assert "tel_Telu" in lang_codes
 
     # -------------------------------------------------------------------------
     # 3. GET /api/metrics (HTTP 200 Verification)
@@ -97,9 +107,10 @@ def run_tests():
     print("  ✓ Real Kannada translation output verified with zero mock prefix")
 
     # -------------------------------------------------------------------------
-    # 5. POST /api/translate (Real English -> Hindi, Zero Mock Prefix)
+    # 5. POST /api/translate (Real English -> Hindi, Tamil, Telugu, Zero Mock Prefix)
     # -------------------------------------------------------------------------
-    print("\n[Test 5] POST /api/translate (Real English -> Hindi)...")
+    print("\n[Test 5] POST /api/translate (English -> Hindi, Tamil, Telugu)...")
+    # 5a. Hindi
     req_hi = TranslationRequest(
         text=sample_en,
         source_lang="eng_Latn",
@@ -107,26 +118,53 @@ def run_tests():
         model_variant="baseline",
     )
     res_hi = translate(req_hi)
-    print(f"  Input : {res_hi.source_text}")
-    print(f"  Output: {res_hi.translated_text}")
-    print(f"  Engine: {res_hi.engine} | Latency: {res_hi.latency_ms} ms")
+    print(f"  [HI] Output: {res_hi.translated_text}")
+    assert not res_hi.translated_text.startswith("अनुवाद (")
+    assert any('\u0900' <= c <= '\u097F' for c in res_hi.translated_text)
+    print("  ✓ Real Hindi translation output verified")
 
-    # Assert real output without mock prefix
-    assert not res_hi.translated_text.startswith("अनुवाद ("), "Output must not contain mock prefix"
-    assert not res_hi.translated_text.startswith("Translation ("), "Output must not contain mock prefix"
-    assert any('\u0900' <= c <= '\u097F' for c in res_hi.translated_text), "Output must contain authentic Devanagari/Hindi characters"
-    print("  ✓ Real Hindi translation output verified with zero mock prefix")
+    # 5b. Tamil
+    req_ta = TranslationRequest(
+        text=sample_en,
+        source_lang="eng_Latn",
+        target_lang="tam_Taml",
+        model_variant="baseline",
+    )
+    res_ta = translate(req_ta)
+    print(f"  [TA] Output: {res_ta.translated_text}")
+    assert not res_ta.translated_text.startswith("Translation (")
+    assert any('\u0B80' <= c <= '\u0BFF' for c in res_ta.translated_text), "Output must contain authentic Tamil characters"
+    print("  ✓ Real Tamil translation output verified")
+
+    # 5c. Telugu
+    req_te = TranslationRequest(
+        text=sample_en,
+        source_lang="eng_Latn",
+        target_lang="tel_Telu",
+        model_variant="baseline",
+    )
+    res_te = translate(req_te)
+    print(f"  [TE] Output: {res_te.translated_text}")
+    assert not res_te.translated_text.startswith("Translation (")
+    assert any('\u0C00' <= c <= '\u0C7F' for c in res_te.translated_text), "Output must contain authentic Telugu characters"
+    print("  ✓ Real Telugu translation output verified")
 
     # -------------------------------------------------------------------------
-    # 6. Reverse Translation (Kannada -> English & Hindi -> English)
+    # 6. Reverse Translation (KN -> EN, HI -> EN, TA -> EN, TE -> EN)
     # -------------------------------------------------------------------------
-    print("\n[Test 6] Reverse Translation (KN -> EN, HI -> EN)...")
+    print("\n[Test 6] Reverse Translation (KN -> EN, HI -> EN, TA -> EN, TE -> EN)...")
     rev_kn = translator_engine.translate(sample_kn, "kan_Knda", "eng_Latn")
     print(f"  KN -> EN: {rev_kn['translated_text']}")
     rev_hi = translator_engine.translate(sample_hi, "hin_Deva", "eng_Latn")
     print(f"  HI -> EN: {rev_hi['translated_text']}")
+    rev_ta = translator_engine.translate(sample_ta, "tam_Taml", "eng_Latn")
+    print(f"  TA -> EN: {rev_ta['translated_text']}")
+    rev_te = translator_engine.translate(sample_te, "tel_Telu", "eng_Latn")
+    print(f"  TE -> EN: {rev_te['translated_text']}")
     assert not rev_kn['translated_text'].startswith("Translation (")
     assert not rev_hi['translated_text'].startswith("Translation (")
+    assert not rev_ta['translated_text'].startswith("Translation (")
+    assert not rev_te['translated_text'].startswith("Translation (")
     print("  ✓ Real reverse translations verified with clean strings")
 
     # -------------------------------------------------------------------------

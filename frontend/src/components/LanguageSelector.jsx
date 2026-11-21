@@ -21,6 +21,8 @@ export const LANGUAGES = [
   { code: 'eng_Latn', iso: 'en', label: 'English', native: 'English', flag: '🇬🇧' },
   { code: 'kan_Knda', iso: 'kn', label: 'Kannada', native: 'ಕನ್ನಡ', flag: '🇮🇳' },
   { code: 'hin_Deva', iso: 'hi', label: 'Hindi', native: 'हिन्दी', flag: '🇮🇳' },
+  { code: 'tam_Taml', iso: 'ta', label: 'Tamil', native: 'தமிழ்', flag: '🇮🇳' },
+  { code: 'tel_Telu', iso: 'te', label: 'Telugu', native: 'తెలుగు', flag: '🇮🇳' },
 ];
 
 const MODEL_VARIANTS = [
@@ -115,8 +117,8 @@ export default function LanguageSelector({
             </select>
           </div>
 
-          {/* Quick Target Switch Pills (Kannada vs Hindi) */}
-          <div className="flex items-center space-x-1.5 ml-1">
+          {/* Quick Target Switch Pills (Kannada, Hindi, Tamil, Telugu) */}
+          <div className="flex items-center space-x-1.5 ml-1 flex-wrap gap-y-1">
             <button
               type="button"
               onClick={() => handleQuickTargetSelect('kan_Knda')}
@@ -140,6 +142,30 @@ export default function LanguageSelector({
               title="Set target to Hindi"
             >
               हिन्दी (hi)
+            </button>
+            <button
+              type="button"
+              onClick={() => handleQuickTargetSelect('tam_Taml')}
+              className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all border ${
+                targetLang === 'tam_Taml'
+                  ? 'bg-amber-100/80 text-amber-900 border-amber-300 shadow-xs'
+                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border-slate-200'
+              }`}
+              title="Set target to Tamil"
+            >
+              தமிழ் (ta)
+            </button>
+            <button
+              type="button"
+              onClick={() => handleQuickTargetSelect('tel_Telu')}
+              className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all border ${
+                targetLang === 'tel_Telu'
+                  ? 'bg-amber-100/80 text-amber-900 border-amber-300 shadow-xs'
+                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border-slate-200'
+              }`}
+              title="Set target to Telugu"
+            >
+              తెలుగు (te)
             </button>
           </div>
 

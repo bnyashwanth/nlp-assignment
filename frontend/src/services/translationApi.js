@@ -143,12 +143,18 @@ function getDefaultLanguagesCatalog() {
       { code: 'eng_Latn', iso: 'en', name: 'English', script: 'Latin', native_name: 'English', flag: '🇬🇧' },
       { code: 'kan_Knda', iso: 'kn', name: 'Kannada', script: 'Kannada', native_name: 'ಕನ್ನಡ', flag: '🇮🇳' },
       { code: 'hin_Deva', iso: 'hi', name: 'Hindi', script: 'Devanagari', native_name: 'हिन्दी', flag: '🇮🇳' },
+      { code: 'tam_Taml', iso: 'ta', name: 'Tamil', script: 'Tamil', native_name: 'தமிழ்', flag: '🇮🇳' },
+      { code: 'tel_Telu', iso: 'te', name: 'Telugu', script: 'Telugu', native_name: 'తెలుగు', flag: '🇮🇳' },
     ],
     supported_pairs: [
       'eng_Latn -> kan_Knda',
       'kan_Knda -> eng_Latn',
       'eng_Latn -> hin_Deva',
       'hin_Deva -> eng_Latn',
+      'eng_Latn -> tam_Taml',
+      'tam_Taml -> eng_Latn',
+      'eng_Latn -> tel_Telu',
+      'tel_Telu -> eng_Latn',
     ],
   };
 }
