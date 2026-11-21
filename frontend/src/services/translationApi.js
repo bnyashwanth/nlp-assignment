@@ -1,5 +1,5 @@
 /**
- * LinguaBridge AI - Translation API Client & Pure-NLP Hybrid Routing Service
+ * Setu - Translation API Client & Pure-NLP Hybrid Routing Service
  * =========================================================================
  * Module: frontend/src/services/translationApi.js
  * 
@@ -157,7 +157,7 @@ export async function getHealth() {
   } catch (err) {
     return {
       status: 'offline',
-      service: 'LinguaBridge AI (Offline Pure-NLP Engine)',
+      service: 'Setu (Offline Translation Engine)',
       device: 'client-cpu',
       is_neural_ready: true,
       error: err.message,
@@ -352,42 +352,8 @@ export async function compareModels({ text, source_lang = 'eng_Latn', target_lan
       }),
     });
   } catch (err) {
-    console.warn('[API] Remote comparison unavailable, simulating using 22RI52 benchmark models:', err.message);
-    const offlineRes = await translateOffline({ text: trimmed, sourceLang: source_lang, targetLang: target_lang });
-    return {
-      source_text: trimmed,
-      source_lang,
-      target_lang,
-      baseline: {
-        model_variant: 'baseline',
-        model_name: 'Baseline Pretrained NLLB-200 (600M)',
-        translated_text: offlineRes.translated_text,
-        latency_ms: 120,
-        benchmark_bleu: 18.45,
-        benchmark_chrf: 41.20,
-      },
-      finetuned_lora: {
-        model_variant: 'lora',
-        model_name: 'LoRA Fine-Tuned (Parallel Only)',
-        translated_text: offlineRes.translated_text,
-        latency_ms: 110,
-        benchmark_bleu: 25.80,
-        benchmark_chrf: 52.65,
-      },
-      finetuned_lora_bt: {
-        model_variant: 'lora_bt',
-        model_name: 'LoRA + Back-Translation (Augmented)',
-        translated_text: offlineRes.translated_text,
-        latency_ms: 105,
-        benchmark_bleu: 29.35,
-        benchmark_chrf: 57.80,
-      },
-      relative_gain_summary: {
-        lora_vs_baseline_bleu: '+39.8%',
-        lora_bt_vs_baseline_bleu: '+59.1%',
-        chrF_gain: '+16.60 points over baseline',
-      },
-    };
+    console.warn('[API] Remote comparison unavailable, using bundled fallback:', err.message);
+    return null;
   }
 }
 
@@ -398,25 +364,7 @@ export async function getMetrics() {
   try {
     return await request('/api/metrics', { timeout: 4000 });
   } catch {
-    return getDefaultMetrics();
+    return null;
   }
 }
 
-function getDefaultMetrics() {
-  return {
-    project: 'LinguaBridge AI',
-    model: 'facebook/nllb-200-distilled-600M',
-    direction: 'eng_Latn -> kan_Knda',
-    test_set_size: 350,
-    systems: {
-      baseline_pretrained: { description: 'Pre-trained facebook/nllb-200-distilled-600M', bleu: 18.45, chrf: 41.20 },
-      lora_finetuned: { description: 'LoRA Fine-Tuned (Parallel Data Only)', bleu: 25.80, chrf: 52.65 },
-      lora_backtranslation: { description: 'LoRA + Back-Translation (Augmented)', bleu: 29.35, chrf: 57.80 },
-    },
-    relative_improvements: {
-      lora_vs_baseline: { delta_bleu: 7.35, delta_chrf: 11.45, bleu_gain_percentage: '+39.8%' },
-      lora_bt_vs_baseline: { delta_bleu: 10.90, delta_chrf: 16.60, bleu_gain_percentage: '+59.1%' },
-      lora_bt_vs_lora_only: { delta_bleu: 3.55, delta_chrf: 5.15, bleu_gain_percentage: '+13.8%' },
-    },
-  };
-}

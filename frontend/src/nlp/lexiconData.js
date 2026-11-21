@@ -1,5 +1,5 @@
 /**
- * LinguaBridge AI - Rich Offline Parallel Corpus & Lexicon
+ * Setu - Rich Offline Parallel Corpus & Lexicon
  * ==========================================================
  * Module: frontend/src/nlp/lexiconData.js
  * 
@@ -124,7 +124,7 @@ export const PHRASES = [
     te: "నేను బెంగళూరు నుండి వచ్చాను.",
   },
 
-  // 2. Academic & College Life (22RI52 Context)
+  // 2. Academic & College Life
   {
     en: "The government announced new educational policies for rural schools.",
     kn: "ಗ್ರಾಮೀಣ ಶಾಲೆಗಳಿಗಾಗಿ ಸರ್ಕಾರವು ಹೊಸ ಶೈಕ್ಷಣಿಕ ನೀತಿಗಳನ್ನು ಪ್ರಕಟಿಸಿತು.",
@@ -648,7 +648,7 @@ export const CORE_LEXICON = [
   { en: "transform", kn: "ಪರಿವರ್ತಿಸು", hi: "बदलना", ta: "மாற்று", te: "మార్చు", pos: "verb" },
   { en: "improve", kn: "ಸುಧಾರಿಸು", hi: "सुधारना", ta: "மேம்படுத்து", te: "మెరుగుపరచు", pos: "verb" },
 
-  // Nouns - Education & Technology (22RI52 Focus)
+  // Nouns - Education & Technology
   { en: "school", kn: "ಶಾಲೆ", hi: "स्कूल", ta: "பள்ளி", te: "పాఠశాల", pos: "noun" },
   { en: "schools", kn: "ಶಾಲೆಗಳು", hi: "स्कूलों", ta: "பள்ளிகள்", te: "పాఠశాలలు", pos: "noun" },
   { en: "college", kn: "ಕಾಲೇಜು", hi: "कॉलेज", ta: "கல்லூரி", te: "కళాశాల", pos: "noun" },

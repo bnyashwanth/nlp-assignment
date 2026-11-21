@@ -1,5 +1,5 @@
 /**
- * LinguaBridge AI - Network & Platform Detection Hook
+ * Setu - Network & Platform Detection Hook
  * ====================================================
  * Module: frontend/src/hooks/useNetwork.js
  * 

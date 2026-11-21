@@ -1,10 +1,10 @@
 /**
- * LinguaBridge AI - Pure-NLP Offline Translation Service
+ * Setu - Pure-NLP Offline Translation Service
  * =======================================================
  * Module: frontend/src/services/offlineTranslation.js
  * 
  * 100% Self-Contained Offline Translation Service (0 MB Download Required):
- * - Replaces Google ML Kit with 22RI52 Pure-NLP Symbolic & Algorithmic Engine
+ * - Uses the bundled lexical and NLP fallback engine
  * - Unicode NFC Normalization, Multilingual Tokenization & English Stemming (Exp 1)
  * - Dynamic Programming Minimum Edit Distance Typo Correction (Exp 3)
  * - Greedy N-Gram Longest-Match Phrase Lookup (Exp 2)

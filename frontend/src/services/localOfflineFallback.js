@@ -1,5 +1,5 @@
 /**
- * LinguaBridge AI - Local Offline Phrase & Dictionary Fallback
+ * Setu - Local Offline Phrase & Dictionary Fallback
  * =============================================================
  * Module: frontend/src/services/localOfflineFallback.js
  * 

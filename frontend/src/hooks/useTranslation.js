@@ -1,5 +1,5 @@
 /**
- * LinguaBridge AI - Translation State Management Hook
+ * Setu - Translation State Management Hook
  * ====================================================
  * Module: frontend/src/hooks/useTranslation.js
  * 
@@ -8,7 +8,7 @@
  * - Text inputs, char counts, and language swapping
  * - Model variant selection (Baseline, LoRA, LoRA+BT)
  * - Real-time network and platform detection via useNetwork hook
- * - Hybrid Translation Execution (Online NLLB FastAPI backend vs. Offline ML Kit on-device)
+ * - Hybrid Translation Execution (Online NLLB FastAPI backend vs. Offline on-device fallback)
  * - Translation result Mode Badge state ('Online Backend' vs 'Offline On-Device')
  * - LocalStorage history persistence with mode flags
  * - Side-by-side 3-way comparative evaluation
@@ -106,9 +106,22 @@ export function useTranslation() {
    * Swaps source and target languages, exchanging existing input and output text.
    */
   const swapLanguages = useCallback(() => {
+    const resolvedSource = sourceLang === 'auto'
+      ? (() => {
+          const script = detectScript(sourceText);
+          return ({
+            latin: 'eng_Latn',
+            kannada: 'kan_Knda',
+            devanagari: 'hin_Deva',
+            tamil: 'tam_Taml',
+            telugu: 'tel_Telu',
+          })[script] || 'eng_Latn';
+        })()
+      : sourceLang;
+
     setSourceLang((prevSrc) => {
       const newSrc = targetLang;
-      setTargetLang(prevSrc);
+      setTargetLang(resolvedSource);
       return newSrc;
     });
 

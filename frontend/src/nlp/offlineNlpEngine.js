@@ -1,15 +1,15 @@
 /**
- * LinguaBridge AI - Pure-NLP Offline Translation Engine
+ * Setu - Pure-NLP Offline Translation Engine
  * =====================================================
  * Module: frontend/src/nlp/offlineNlpEngine.js
  * 
- * 100% Client-Side Neural/Symbolic NLP Engine based on 22RI52 Lab Concepts:
+ * 100% Client-Side Neural/Symbolic NLP Engine:
  * - Exp 1: Unicode NFC Normalization, Multilingual Tokenization, Script Validation & Stemming
  * - Exp 2: Greedy N-Gram Longest-Match Phrase Lookup (4-gram -> 3-gram -> 2-gram -> 1-gram)
  * - Exp 3: Minimum Edit Distance (MED) Dynamic Programming Typo Correction (Levenshtein)
  * - Syntactic Structure Transformation: SVO (English) -> SOV (Kannada, Hindi, Tamil, Telugu)
  * 
- * Works 100% offline out-of-the-box on web and Android APK with ZERO ML Kit or external model downloads.
+ * Works offline in the web bundle and in the Android fallback engine.
  */
 
 import { PHRASES, MULTIWORD_LEXICON, CORE_LEXICON, STEM_MAP } from './lexiconData.js';

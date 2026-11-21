@@ -1,5 +1,5 @@
 /**
- * LinguaBridge AI - Translation API Re-Export Proxy
+ * Setu - Translation API Re-Export Proxy
  * =================================================
  * Convenience proxy to frontend/src/services/translationApi.js
  */

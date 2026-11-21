@@ -1,5 +1,5 @@
 /**
- * LinguaBridge AI - Translation Cache Manager
+ * Setu - Translation Cache Manager
  * ============================================
  * Module: frontend/src/services/translationCache.js
  * 
