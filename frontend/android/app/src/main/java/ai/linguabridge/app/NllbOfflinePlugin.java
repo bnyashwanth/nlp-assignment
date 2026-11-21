@@ -24,6 +24,7 @@ import java.util.Map;
 
 import ai.onnxruntime.OnnxTensor;
 import ai.onnxruntime.OrtEnvironment;
+import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtSession;
 
 @CapacitorPlugin(name = "NllbOfflinePlugin")
@@ -69,11 +70,12 @@ public class NllbOfflinePlugin extends Plugin {
         }
 
         environment = OrtEnvironment.getEnvironment();
-        OrtSession.SessionOptions options = new OrtSession.SessionOptions();
-        options.setMemoryPattern(false);
-        options.setIntraOpNumThreads(Math.max(1, Math.min(4, Runtime.getRuntime().availableProcessors())));
-        encoderSession = environment.createSession(encoderFile.getAbsolutePath(), options);
-        decoderSession = environment.createSession(decoderFile.getAbsolutePath(), options);
+        try (OrtSession.SessionOptions options = new OrtSession.SessionOptions()) {
+            options.setMemoryPatternOptimization(false);
+            options.setIntraOpNumThreads(Math.max(1, Math.min(4, Runtime.getRuntime().availableProcessors())));
+            encoderSession = environment.createSession(encoderFile.getAbsolutePath(), options);
+            decoderSession = environment.createSession(decoderFile.getAbsolutePath(), options);
+        }
 
         File tokenizerFile = new File(modelDir, "tokenizer.json");
         java.io.BufferedReader reader = new java.io.BufferedReader(
@@ -288,6 +290,8 @@ public class NllbOfflinePlugin extends Plugin {
             result.put("translatedText", translated);
             result.put("latencyMs", System.currentTimeMillis() - start);
             call.resolve(result);
+        } catch (OrtException error) {
+            call.reject("NLLB_ONNX_ERROR", error);
         } catch (Exception error) {
             call.reject("NLLB_ONNX_ERROR", error);
         }
