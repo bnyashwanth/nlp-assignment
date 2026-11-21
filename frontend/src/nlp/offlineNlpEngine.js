@@ -450,7 +450,7 @@ export async function translateOfflineNLP({ text, source_lang, target_lang }) {
     translated_text: resultText || rawText,
     source_lang,
     target_lang,
-    engine: 'Offline Pure-NLP Engine (22RI52 SVO-SOV + MED)',
+    engine: 'Offline NLP Engine',
     mode: 'offline',
     isOffline: true,
     latency_ms: Math.max(2, Math.round(latency)),

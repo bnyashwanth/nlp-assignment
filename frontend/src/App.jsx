@@ -14,8 +14,8 @@ export default function App() {
     <div className="app-shell">
       <header className="top-nav">
         <button className="brand" type="button" onClick={() => setActiveView('home')}>
-          <span className="brand-mark" aria-hidden="true">LB</span>
-          <span>LinguaBridge</span>
+          <span className="brand-mark" aria-hidden="true">S</span>
+          <span>Setu</span>
         </button>
         <nav aria-label="Primary navigation">
           <button type="button" className={activeView === 'home' ? 'active' : ''} onClick={() => setActiveView('home')}>Home</button>
@@ -30,16 +30,16 @@ export default function App() {
           </div>
           <section className="hero">
             <span className="language-pill">{LANGUAGES}</span>
-            <h1>Words connect us.</h1>
-            <p>Translate naturally between English, Kannada, Hindi, Tamil, and Telugu.</p>
+            <h1>Find the words that carry meaning.</h1>
+            <p>Setu translates between English, Kannada, Hindi, Tamil, and Telugu, with text preparation handled quietly in the background.</p>
             <button className="primary-cta" type="button" onClick={() => setActiveView('translator')}>
               Open the translator <ArrowRight size={17} />
             </button>
           </section>
           <section className="feature-grid" aria-label="Features">
-            <article><span>01</span><h2>Multilingual Support</h2><p>Move naturally across five widely used Indic and English languages.</p></article>
-            <article><span>02</span><h2>Offline Neural & NLP Engine</h2><p>Built-in neural translation with silent text preprocessing and fallback.</p></article>
-            <article><span>03</span><h2>Everyday Use</h2><p>A focused workspace for clear, practical translation wherever you are.</p></article>
+            <article><span>01</span><h2>Five Languages</h2><p>English, Kannada, Hindi, Tamil, and Telugu in one focused workspace.</p></article>
+            <article><span>02</span><h2>Natural Translation</h2><p>NLLB neural translation is available through the web service or as an embedded Android model.</p></article>
+            <article><span>03</span><h2>Built for Daily Text</h2><p>Translate messages, notes, and everyday passages without a cluttered interface.</p></article>
           </section>
         </main>
       )}
