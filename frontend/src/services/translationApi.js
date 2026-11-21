@@ -16,6 +16,10 @@
 
 import { translateOffline } from './offlineTranslation';
 import { getCachedTranslation, saveCachedTranslation } from './translationCache';
+import { Capacitor, registerPlugin } from '@capacitor/core';
+import { detectScript } from '../nlp/offlineNlpEngine';
+
+const NllbOfflinePlugin = registerPlugin('NllbOfflinePlugin');
 
 export const BACKEND_URL_STORAGE_KEY = 'linguabridge_backend_url';
 export const DEFAULT_REQUEST_TIMEOUT_MS = 10000;       // 10 seconds for health/metrics
@@ -222,6 +226,30 @@ export async function translateText({
       mode: 'online',
       engine: 'Online Python NLLB-200',
     };
+  }
+
+  if (Capacitor.isNativePlatform()) {
+    try {
+      const nativeResult = await NllbOfflinePlugin.translate({
+        text: trimmed,
+        sourceLang: source_lang,
+        targetLang: target_lang,
+      });
+      const result = {
+        source_text: trimmed,
+        translated_text: nativeResult.translatedText,
+        source_lang,
+        target_lang,
+        mode: 'offline',
+        engine: 'Offline Xenova NLLB-200 ONNX',
+        isOffline: true,
+        latency_ms: nativeResult.latencyMs || 0,
+      };
+      saveCachedTranslation(trimmed, source_lang, target_lang, result);
+      return result;
+    } catch (nativeError) {
+      console.warn('[NllbOfflinePlugin] Native ONNX unavailable, using bundled NLP fallback:', nativeError.message);
+    }
   }
 
   // 1. Check local cache

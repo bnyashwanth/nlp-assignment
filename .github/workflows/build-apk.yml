@@ -2,30 +2,26 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: ["main", "master"]
   workflow_dispatch:
 
 jobs:
   build-apk:
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: ./frontend
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Setup Java JDK
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "21"
@@ -39,6 +35,17 @@ jobs:
         run: |
           npm run build
           npx cap sync android
+
+      - name: Bake Xenova NLLB-200 ONNX model into Android assets
+        env:
+          HF_BASE: https://huggingface.co/Xenova/nllb-200-distilled-600M/resolve/main
+        run: |
+          mkdir -p android/app/src/main/assets/nllb
+          curl -fL "$HF_BASE/onnx/encoder_model_quantized.onnx" -o android/app/src/main/assets/nllb/encoder_model_quantized.onnx
+          curl -fL "$HF_BASE/onnx/decoder_model_merged_quantized.onnx" -o android/app/src/main/assets/nllb/decoder_model_merged_quantized.onnx
+          curl -fL "$HF_BASE/tokenizer.json" -o android/app/src/main/assets/nllb/tokenizer.json
+          curl -fL "$HF_BASE/sentencepiece.bpe.model" -o android/app/src/main/assets/nllb/sentencepiece.bpe.model
+          curl -fL "$HF_BASE/config.json" -o android/app/src/main/assets/nllb/config.json
 
       - name: Build debug APK with Gradle
         run: |

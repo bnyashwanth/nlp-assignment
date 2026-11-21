@@ -68,6 +68,7 @@ htmlcov/
 *.bin
 *.safetensors
 *.onnx
+frontend/android/app/src/main/assets/nllb/
 *.ckpt
 *.h5
 checkpoints/

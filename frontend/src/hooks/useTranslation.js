@@ -18,6 +18,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { translateText, compareModels, getMetrics } from '../services/translationApi';
 import { useNetwork } from './useNetwork';
+import { detectScript } from '../nlp/offlineNlpEngine';
 
 const STORAGE_KEY = 'linguabridge_translation_history';
 const MAX_HISTORY_ITEMS = 30;
@@ -29,7 +30,7 @@ export function useTranslation() {
   // Input & Translation State
   const [sourceText, setSourceText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
-  const [sourceLang, setSourceLang] = useState('eng_Latn');
+  const [sourceLang, setSourceLang] = useState('auto');
   const [targetLang, setTargetLang] = useState('kan_Knda');
   const [modelVariant, setModelVariant] = useState('lora_bt'); // default to best model
 
@@ -140,6 +141,17 @@ export function useTranslation() {
   const handleTranslate = useCallback(async (customText = null) => {
     const textToTranslate = (customText !== null ? customText : sourceText).trim();
     if (!textToTranslate) return;
+    const scriptSource = (() => {
+      if (sourceLang !== 'auto') return sourceLang;
+      const script = detectScript(textToTranslate);
+      return ({
+        latin: 'eng_Latn',
+        kannada: 'kan_Knda',
+        devanagari: 'hin_Deva',
+        tamil: 'tam_Taml',
+        telugu: 'tel_Telu',
+      })[script] || 'eng_Latn';
+    })();
 
     setIsLoading(true);
     setError(null);
@@ -148,7 +160,7 @@ export function useTranslation() {
     try {
       const response = await translateText({
         text: textToTranslate,
-        source_lang: sourceLang,
+        source_lang: scriptSource,
         target_lang: targetLang,
         model_variant: modelVariant,
         isOnline: isConnected,
@@ -168,7 +180,7 @@ export function useTranslation() {
         timestamp: new Date().toISOString(),
         sourceText: textToTranslate,
         translatedText: response.translated_text,
-        sourceLang,
+        sourceLang: scriptSource,
         targetLang,
         modelVariant,
         latencyMs: response.latency_ms,
