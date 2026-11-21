@@ -77,7 +77,7 @@ export default function TranslationOutput({
       <div className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 flex-wrap gap-2">
         <div className="flex items-center space-x-2">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-            Translation ({targetLang === 'kan_Knda' ? 'Kannada' : 'English'})
+            Translation ({targetLang === 'kan_Knda' ? 'Kannada' : targetLang === 'hin_Deva' ? 'Hindi' : 'English'})
           </span>
 
           {/* Mode Badge: Online Backend vs Offline On-Device Model */}

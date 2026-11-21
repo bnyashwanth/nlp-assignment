@@ -61,9 +61,21 @@ app = FastAPI(
 )
 
 # Enable Cross-Origin Resource Sharing (CORS)
+ALLOWED_ORIGINS = [
+    "*",
+    "http://localhost",
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://localhost:7860",
+    "https://localhost",
+    "capacitor://localhost",
+    "ionic://localhost",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -115,6 +127,7 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 # Root / Health Route
 # ============================================================================
 
+@app.get("/health", tags=["Health"], summary="Health check")
 @app.get(
     "/",
     tags=["Root"],

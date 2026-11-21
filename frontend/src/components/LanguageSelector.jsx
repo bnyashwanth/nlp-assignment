@@ -2,34 +2,44 @@
  * LinguaBridge AI - LanguageSelector Component
  * ============================================
  * Module: frontend/src/components/LanguageSelector.jsx
- * Provides interactive language direction swapping and model architecture selector pills.
+ * 
+ * Supports multilingual translation:
+ * - English (eng_Latn) ↔ Kannada (kan_Knda)
+ * - English (eng_Latn) ↔ Hindi (hin_Deva)
+ * 
+ * Features:
+ * - Interactive source and target dropdowns with flag emojis and native script names
+ * - One-click target language switch pills between Kannada and Hindi
+ * - Bi-directional language swapping (onSwap)
+ * - Model architecture selector (Baseline, LoRA Fine-Tuned, LoRA + Back-Translation)
  */
 
 import React from 'react';
-import { ArrowLeftRight, Check, Zap } from 'lucide-react';
+import { ArrowLeftRight, Check, Zap, Globe2 } from 'lucide-react';
 
-const LANGUAGES = [
-  { code: 'eng_Latn', label: 'English', native: 'English', flag: '🇬🇧' },
-  { code: 'kan_Knda', label: 'Kannada', native: 'ಕನ್ನಡ', flag: '🇮🇳' },
+export const LANGUAGES = [
+  { code: 'eng_Latn', iso: 'en', label: 'English', native: 'English', flag: '🇬🇧' },
+  { code: 'kan_Knda', iso: 'kn', label: 'Kannada', native: 'ಕನ್ನಡ', flag: '🇮🇳' },
+  { code: 'hin_Deva', iso: 'hi', label: 'Hindi', native: 'हिन्दी', flag: '🇮🇳' },
 ];
 
 const MODEL_VARIANTS = [
   {
     id: 'lora_bt',
     title: 'LoRA + Back-Translation',
-    badge: '⭐ Recommended (BLEU 29.35 / chrF 57.80)',
+    badge: '⭐ Recommended (Augmented)',
     color: 'emerald',
   },
   {
     id: 'lora',
     title: 'LoRA Fine-Tuned',
-    badge: 'Parallel Only (BLEU 25.80 / chrF 52.65)',
+    badge: 'PEFT Parallel Only',
     color: 'blue',
   },
   {
     id: 'baseline',
     title: 'Baseline NLLB-200',
-    badge: 'Pretrained 600M (BLEU 18.45 / chrF 41.20)',
+    badge: 'Pretrained 600M Base',
     color: 'slate',
   },
 ];
@@ -38,23 +48,45 @@ export default function LanguageSelector({
   sourceLang,
   targetLang,
   onSwap,
+  onChangeSource,
+  onChangeTarget,
   modelVariant,
   onModelChange,
 }) {
   const currentSource = LANGUAGES.find((l) => l.code === sourceLang) || LANGUAGES[0];
   const currentTarget = LANGUAGES.find((l) => l.code === targetLang) || LANGUAGES[1];
 
+  /**
+   * Handle quick target switch between Kannada and Hindi
+   */
+  const handleQuickTargetSelect = (code) => {
+    if (onChangeTarget) {
+      onChangeTarget(code);
+    }
+  };
+
   return (
-    <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 mb-6 space-y-4">
-      {/* Top Bar: Language Pairs & Swap Button */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className="flex items-center space-x-2 sm:space-x-4">
+    <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200/80 mb-6 space-y-4">
+      {/* Top Bar: Language Selectors & Swap Button */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        
+        {/* Source & Target Dropdowns / Controls */}
+        <div className="flex items-center space-x-2 sm:space-x-3 flex-wrap sm:flex-nowrap">
           
-          {/* Source Language Tag */}
-          <div className="flex items-center space-x-2 px-3 py-2 rounded-xl bg-slate-100/90 border border-slate-200 text-sm font-semibold text-slate-800">
-            <span>{currentSource.flag}</span>
-            <span>{currentSource.label}</span>
-            <span className="text-xs text-slate-400 font-normal">({currentSource.code})</span>
+          {/* Source Language Picker */}
+          <div className="relative">
+            <select
+              value={sourceLang}
+              onChange={(e) => onChangeSource && onChangeSource(e.target.value)}
+              className="appearance-none bg-slate-100 hover:bg-slate-200/80 border border-slate-200 text-slate-800 text-sm font-semibold rounded-xl pl-3 pr-8 py-2.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-500/30 transition-all shadow-xs"
+              title="Select source language"
+            >
+              {LANGUAGES.map((lang) => (
+                <option key={lang.code} value={lang.code}>
+                  {lang.flag} {lang.label} ({lang.native})
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Swap Button */}
@@ -67,18 +99,56 @@ export default function LanguageSelector({
             <ArrowLeftRight className="w-4 h-4" />
           </button>
 
-          {/* Target Language Tag */}
-          <div className="flex items-center space-x-2 px-3 py-2 rounded-xl bg-slate-100/90 border border-slate-200 text-sm font-semibold text-slate-800">
-            <span>{currentTarget.flag}</span>
-            <span>{currentTarget.label}</span>
-            <span className="text-xs text-slate-400 font-normal">({currentTarget.code})</span>
+          {/* Target Language Picker */}
+          <div className="relative">
+            <select
+              value={targetLang}
+              onChange={(e) => onChangeTarget && onChangeTarget(e.target.value)}
+              className="appearance-none bg-slate-100 hover:bg-slate-200/80 border border-slate-200 text-slate-800 text-sm font-semibold rounded-xl pl-3 pr-8 py-2.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-500/30 transition-all shadow-xs"
+              title="Select target language"
+            >
+              {LANGUAGES.map((lang) => (
+                <option key={lang.code} value={lang.code}>
+                  {lang.flag} {lang.label} ({lang.native})
+                </option>
+              ))}
+            </select>
           </div>
+
+          {/* Quick Target Switch Pills (Kannada vs Hindi) */}
+          <div className="flex items-center space-x-1.5 ml-1">
+            <button
+              type="button"
+              onClick={() => handleQuickTargetSelect('kan_Knda')}
+              className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all border ${
+                targetLang === 'kan_Knda'
+                  ? 'bg-amber-100/80 text-amber-900 border-amber-300 shadow-xs'
+                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border-slate-200'
+              }`}
+              title="Set target to Kannada"
+            >
+              ಕನ್ನಡ (kn)
+            </button>
+            <button
+              type="button"
+              onClick={() => handleQuickTargetSelect('hin_Deva')}
+              className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all border ${
+                targetLang === 'hin_Deva'
+                  ? 'bg-amber-100/80 text-amber-900 border-amber-300 shadow-xs'
+                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border-slate-200'
+              }`}
+              title="Set target to Hindi"
+            >
+              हिन्दी (hi)
+            </button>
+          </div>
+
         </div>
 
-        {/* Translation Direction Label */}
-        <div className="text-xs font-medium text-slate-500 flex items-center space-x-1.5">
+        {/* Translation Mode Badge / Direction Tag */}
+        <div className="text-xs font-medium text-slate-500 flex items-center space-x-1.5 shrink-0">
           <Zap className="w-3.5 h-3.5 text-amber-500" />
-          <span>Autoregressive Beam Search (Beam Width: 4)</span>
+          <span>Seq2Seq Beam Decoding (4 Beams)</span>
         </div>
       </div>
 

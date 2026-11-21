@@ -52,6 +52,14 @@ const MANAGED_LANGUAGES = [
     description: 'Kannada regional model pack for on-device inference',
     sizeEstimate: '~30 MB',
   },
+  {
+    code: Language.Hindi, // 'hi'
+    name: 'Hindi',
+    nativeName: 'हिन्दी',
+    flag: '🇮🇳',
+    description: 'Hindi Devanagari model pack for on-device inference',
+    sizeEstimate: '~30 MB',
+  },
 ];
 
 export default function OfflineModelManager({ isOpen, onClose, isInline = false }) {
@@ -200,7 +208,7 @@ export default function OfflineModelManager({ isOpen, onClose, isInline = false 
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h4 className="text-sm font-bold text-slate-800">English ↔ Kannada Model Packs</h4>
+              <h4 className="text-sm font-bold text-slate-800">English ↔ Kannada & Hindi Model Packs</h4>
               {isNative ? (
                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
                   <Smartphone className="w-3 h-3 mr-1" /> Native Android / iOS

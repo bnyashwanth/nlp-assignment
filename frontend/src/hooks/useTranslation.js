@@ -81,6 +81,26 @@ export function useTranslation() {
   }, []);
 
   /**
+   * Updates source language, preventing identical source/target conflict
+   */
+  const changeSourceLanguage = useCallback((newSource) => {
+    setSourceLang(newSource);
+    if (newSource === targetLang) {
+      setTargetLang(newSource === 'eng_Latn' ? 'kan_Knda' : 'eng_Latn');
+    }
+  }, [targetLang]);
+
+  /**
+   * Updates target language, preventing identical source/target conflict
+   */
+  const changeTargetLanguage = useCallback((newTarget) => {
+    setTargetLang(newTarget);
+    if (newTarget === sourceLang) {
+      setSourceLang(newTarget === 'eng_Latn' ? 'kan_Knda' : 'eng_Latn');
+    }
+  }, [sourceLang]);
+
+  /**
    * Swaps source and target languages, exchanging existing input and output text.
    */
   const swapLanguages = useCallback(() => {
@@ -269,6 +289,8 @@ export function useTranslation() {
 
     // Operations
     swapLanguages,
+    changeSourceLanguage,
+    changeTargetLanguage,
     clearText,
     handleTranslate,
     handleCompare,

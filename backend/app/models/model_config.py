@@ -30,7 +30,7 @@ class AppConfig(BaseSettings):
         "Production-grade Neural Machine Translation API for English ↔ Kannada "
         "(eng_Latn ↔ kan_Knda) using facebook/nllb-200-distilled-600M and LoRA."
     )
-    port: int = int(os.getenv("PORT", "7860"))  # Hugging Face Spaces default port
+    port: int = int(os.getenv("PORT", "8000"))  # Default local port 8000 (overridden by PORT env)
     debug: bool = os.getenv("DEBUG", "false").lower() == "true"
 
     # Foundation & Adapter Models
@@ -92,12 +92,20 @@ class AppConfig(BaseSettings):
             "native_name": "ಕನ್ನಡ",
             "sample": "ಗ್ರಾಮೀಣ ಶಾಲೆಗಳಿಗಾಗಿ ಸರ್ಕಾರವು ಹೊಸ ಶೈಕ್ಷಣಿಕ ನೀತಿಗಳನ್ನು ಪ್ರಕಟಿಸಿತು.",
         },
+        "hin_Deva": {
+            "name": "Hindi",
+            "script": "Devanagari",
+            "native_name": "हिन्दी",
+            "sample": "सरकार ने ग्रामीण स्कूलों के लिए नई शैक्षिक नीतियों की घोषणा की।",
+        },
     }
 
     # Supported Translation Directions
     supported_pairs: List[str] = [
         "eng_Latn -> kan_Knda",
         "kan_Knda -> eng_Latn",
+        "eng_Latn -> hin_Deva",
+        "hin_Deva -> eng_Latn",
     ]
 
     class Config:

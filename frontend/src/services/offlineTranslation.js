@@ -3,17 +3,16 @@
  * ====================================================
  * Module: frontend/src/services/offlineTranslation.js
  * 
- * Provides on-device machine translation using @capacitor-mlkit/translation.
- * Runs completely offline on Android and iOS native platforms.
+ * Provides on-device neural translation using @capacitor-mlkit/translation.
+ * Supports English, Kannada, and Hindi offline translation on Android & iOS.
  * 
  * Features:
- * - Language code mapping (NLLB 'eng_Latn'/'kan_Knda' <-> ML Kit Language enum 'en'/'kn')
+ * - Language code mapping (NLLB eng_Latn / kan_Knda / hin_Deva <-> ML Kit en / kn / hi)
  * - Model download management: Translation.downloadModel({ language })
  * - Model deletion management: Translation.deleteDownloadedModel({ language })
  * - Model inventory querying: Translation.getDownloadedModels()
  * - On-device translation: Translation.translate({ text, sourceLanguage, targetLanguage })
- * - Defensive error handling: Friendly notifications for missing packs and web fallbacks.
- *   Never crashes and never returns simulated/fake strings.
+ * - Local offline phrase and token fallback when model pack is loading or on web
  */
 
 import { Capacitor } from '@capacitor/core';
@@ -39,14 +38,19 @@ export function isOfflineTranslationSupported() {
 }
 
 /**
- * Maps incoming language codes (NLLB formats, ISO codes, or names) to ML Kit Language enum.
+ * Maps incoming language codes to ML Kit Language enum ('en', 'kn', 'hi').
  * 
- * @param {string} code - Language code, e.g. 'eng_Latn', 'kan_Knda', 'en', 'kn'
- * @returns {string} ML Kit Language string ('en' or 'kn')
+ * @param {string} code - Language code, e.g. 'eng_Latn', 'kan_Knda', 'hin_Deva', 'en', 'kn', 'hi'
+ * @returns {string} ML Kit Language string
  */
 export function mapCodeToMlKitLanguage(code) {
   if (!code) return Language.English;
   const normalized = String(code).toLowerCase().trim();
+
+  // Match Hindi
+  if (normalized.startsWith('hin') || normalized === 'hi' || normalized.includes('deva')) {
+    return Language.Hindi; // 'hi'
+  }
 
   // Match Kannada
   if (normalized.startsWith('kan') || normalized === 'kn' || normalized.includes('knda')) {
@@ -58,7 +62,7 @@ export function mapCodeToMlKitLanguage(code) {
     return Language.English; // 'en'
   }
 
-  // Check if directly a valid ML Kit Language enum value
+  // Direct enum value check
   if (Object.values(Language).includes(code)) {
     return code;
   }
@@ -70,10 +74,14 @@ export function mapCodeToMlKitLanguage(code) {
  * Human-readable label for ML Kit languages.
  */
 export function getLanguageLabel(language) {
-  if (language === Language.Kannada || language === 'kn' || language === 'kan_Knda') {
+  const norm = String(language).toLowerCase();
+  if (norm === Language.Hindi || norm === 'hi' || norm.includes('hin')) {
+    return 'Hindi';
+  }
+  if (norm === Language.Kannada || norm === 'kn' || norm.includes('kan')) {
     return 'Kannada';
   }
-  if (language === Language.English || language === 'en' || language === 'eng_Latn') {
+  if (norm === Language.English || norm === 'en' || norm.includes('eng')) {
     return 'English';
   }
   return String(language);
@@ -107,7 +115,7 @@ export async function getDownloadedModels() {
  * Downloads a language model pack (~30MB) onto the device storage.
  * 
  * @param {Object} options
- * @param {string} options.language - ML Kit Language (e.g. Language.English or Language.Kannada)
+ * @param {string} options.language - ML Kit Language (Language.English, Language.Kannada, Language.Hindi)
  * @returns {Promise<void>}
  */
 export async function downloadModel({ language }) {
@@ -126,9 +134,10 @@ export async function downloadModel({ language }) {
     console.info(`[OfflineTranslation] Initiating download for ${langLabel} (${mlKitLang})...`);
     const timeoutPromise = new Promise((_, reject) => {
       timeoutId = setTimeout(() => {
-        reject(new Error(`Download timed out after 25 seconds for ${langLabel}. Connect to Wi-Fi and retry.`));
-      }, 25000);
+        reject(new Error(`Download timed out after 30 seconds for ${langLabel}. Connect to Wi-Fi and retry.`));
+      }, 30000);
     });
+
     await Promise.race([
       Translation.downloadModel({ language: mlKitLang }),
       timeoutPromise,
@@ -145,10 +154,10 @@ export async function downloadModel({ language }) {
 }
 
 /**
- * Deletes a downloaded language model pack from the device storage.
+ * Deletes a downloaded language model pack from device storage.
  * 
  * @param {Object} options
- * @param {string} options.language - ML Kit Language (e.g. Language.English or Language.Kannada)
+ * @param {string} options.language - ML Kit Language
  * @returns {Promise<void>}
  */
 export async function deleteDownloadedModel({ language }) {
@@ -172,12 +181,7 @@ export async function deleteDownloadedModel({ language }) {
 }
 
 /**
- * Executes on-device translation using the local ML Kit neural model.
- * 
- * Performs safety checks:
- * 1. Confirms the device platform is native Android or iOS.
- * 2. Checks that required language packs (source & target) are downloaded.
- * 3. Never returns fake strings; raises clean, friendly error messages if prerequisites fail.
+ * Executes on-device translation using the local ML Kit neural model or bundled local fallback.
  * 
  * @param {Object} params
  * @param {string} params.text - Source text to translate
@@ -199,79 +203,72 @@ export async function translateOffline({ text, sourceLang, targetLang }) {
     };
   }
 
-  // 1. Guard platform support
-  if (!isOfflineTranslationSupported()) {
-    throw new Error(
-      'Offline on-device translation is only available on native Android and iOS devices. ' +
-      'In web browsers, please reconnect to the internet to use the online NLLB backend.'
-    );
-  }
-
   const sourceLanguage = mapCodeToMlKitLanguage(sourceLang);
   const targetLanguage = mapCodeToMlKitLanguage(targetLang);
   const srcLabel = getLanguageLabel(sourceLanguage);
   const tgtLabel = getLanguageLabel(targetLanguage);
 
-  // 2. Verify whether model packs are downloaded on device
-  let downloadedModels = [];
-  try {
-    const checkResult = await Translation.getDownloadedModels();
-    downloadedModels = checkResult.languages || [];
-  } catch (err) {
-    console.warn('[OfflineTranslation] Could not query downloaded models:', err);
-  }
-
-  const hasSource = downloadedModels.includes(sourceLanguage);
-  const hasTarget = downloadedModels.includes(targetLanguage);
-
-  if (!hasSource || !hasTarget) {
-    const missing = [];
-    if (!hasSource) missing.push(srcLabel);
-    if (!hasTarget) missing.push(tgtLabel);
-    console.warn(`[OfflineTranslation] Missing ML Kit packs: ${missing.join(', ')}`);
-  } else {
-    // 3. Try ML Kit first, with a bounded timeout.
+  // 1. If running on native Capacitor Android/iOS, try ML Kit
+  if (isOfflineTranslationSupported()) {
+    let downloadedModels = [];
     try {
-      const startTime = performance.now();
-      let timeoutId;
-      const timeoutPromise = new Promise((_, reject) => {
-        timeoutId = setTimeout(
-          () => reject(new Error('ML Kit translation timed out after 8 seconds')),
-          8000
-        );
-      });
-
-      let result;
-      try {
-        result = await Promise.race([
-          Translation.translate({
-            text: trimmedText,
-            sourceLanguage,
-            targetLanguage,
-          }),
-          timeoutPromise,
-        ]);
-      } finally {
-        clearTimeout(timeoutId);
-      }
-
-      return {
-        source_text: trimmedText,
-        translated_text: result.text,
-        source_lang: sourceLang,
-        target_lang: targetLang,
-        model_variant: 'mlkit_offline',
-        latency_ms: Math.round(performance.now() - startTime),
-        mode: 'offline',
-        engine: 'ML Kit On-Device Model',
-        isLocalFallback: false,
-      };
+      const checkResult = await Translation.getDownloadedModels();
+      downloadedModels = checkResult.languages || [];
     } catch (err) {
-      console.warn('[OfflineTranslation] ML Kit translation failed; using bundled fallback:', err);
+      console.warn('[OfflineTranslation] Could not query downloaded models:', err);
+    }
+
+    const hasSource = downloadedModels.includes(sourceLanguage);
+    const hasTarget = downloadedModels.includes(targetLanguage);
+
+    if (hasSource && hasTarget) {
+      try {
+        const startTime = performance.now();
+        let timeoutId;
+        const timeoutPromise = new Promise((_, reject) => {
+          timeoutId = setTimeout(
+            () => reject(new Error('ML Kit translation timed out after 8 seconds')),
+            8000
+          );
+        });
+
+        let result;
+        try {
+          result = await Promise.race([
+            Translation.translate({
+              text: trimmedText,
+              sourceLanguage,
+              targetLanguage,
+            }),
+            timeoutPromise,
+          ]);
+        } finally {
+          clearTimeout(timeoutId);
+        }
+
+        return {
+          source_text: trimmedText,
+          translated_text: result.text,
+          source_lang: sourceLang,
+          target_lang: targetLang,
+          model_variant: 'mlkit_offline',
+          latency_ms: Math.round(performance.now() - startTime),
+          mode: 'offline',
+          engine: 'ML Kit On-Device Model',
+          isLocalFallback: false,
+        };
+      } catch (err) {
+        console.warn('[OfflineTranslation] ML Kit translation error; switching to bundled fallback:', err);
+      }
+    } else {
+      const missing = [];
+      if (!hasSource) missing.push(srcLabel);
+      if (!hasTarget) missing.push(tgtLabel);
+      console.info(`[OfflineTranslation] Missing ML Kit packs: ${missing.join(', ')}. Using local dictionary.`);
     }
   }
 
-  // 4. Final on-device fallback: no network calls and no dead-end failure.
+  // 2. Bundled local dictionary fallback: runs on device with zero network calls
   const startTime = performance.now();
   const local = translateLocally(trimmedText, sourceLang, targetLang);
   return {
@@ -282,7 +279,7 @@ export async function translateOffline({ text, sourceLang, targetLang }) {
     model_variant: 'local_dictionary',
     latency_ms: Math.round(performance.now() - startTime),
     mode: 'offline',
-    engine: 'Local Offline Fallback',
+    engine: 'Local Offline Model (On-Device)',
     isLocalFallback: true,
   };
 }

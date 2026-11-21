@@ -42,7 +42,7 @@ export default function TranslatorPanel({
       {/* Card Header */}
       <div className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
         <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-          Source Text ({sourceLang === 'eng_Latn' ? 'English' : 'Kannada'})
+          Source Text ({sourceLang === 'eng_Latn' ? 'English' : sourceLang === 'hin_Deva' ? 'Hindi' : 'Kannada'})
         </span>
 
         {/* Quick Sample Trigger */}
@@ -64,7 +64,9 @@ export default function TranslatorPanel({
           placeholder={
             sourceLang === 'eng_Latn'
               ? "Type or paste English text to translate... (e.g., 'The government announced new educational policies for rural schools.')"
-              : "ಇಲ್ಲಿ ಕನ್ನಡ ಪಠ್ಯವನ್ನು ನಮೂದಿಸಿ..."
+              : sourceLang === 'hin_Deva'
+              ? "यहाँ हिन्दी पाठ दर्ज करें... (e.g., 'सरकार ने ग्रामीण स्कूलों के लिए नई शैक्षिक नीतियों की घोषणा की।')"
+              : "ಇಲ್ಲಿ ಕನ್ನಡ ಪಠ್ಯವನ್ನು ನಮೂದಿಸಿ... (e.g., 'ಗ್ರಾಮೀಣ ಶಾಲೆಗಳಿಗಾಗಿ ಸರ್ಕಾರವು ಹೊಸ ಶೈಕ್ಷಣಿಕ ನೀತಿಗಳನ್ನು ಪ್ರಕಟಿಸಿತು.')"
           }
           className="w-full flex-1 resize-none border-none outline-none text-slate-800 placeholder-slate-400 text-base leading-relaxed bg-transparent font-sans"
           disabled={isLoading || isComparing}

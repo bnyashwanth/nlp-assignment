@@ -78,6 +78,8 @@ export default function App() {
 
     // Handlers
     swapLanguages,
+    changeSourceLanguage,
+    changeTargetLanguage,
     clearText,
     handleTranslate,
     handleCompare,
@@ -149,7 +151,7 @@ export default function App() {
           <div className="flex items-center space-x-2 text-slate-600">
             <HardDrive className="w-4 h-4 text-brand-600" />
             <span className="font-semibold text-slate-800">Offline Model Packs:</span>
-            <span>English ↔ Kannada (~30MB each)</span>
+            <span>English ↔ Kannada & Hindi (~30MB each)</span>
           </div>
 
           <div className="flex items-center space-x-2">
@@ -186,6 +188,8 @@ export default function App() {
           sourceLang={sourceLang}
           targetLang={targetLang}
           onSwap={swapLanguages}
+          onChangeSource={changeSourceLanguage}
+          onChangeTarget={changeTargetLanguage}
           modelVariant={modelVariant}
           onModelChange={setModelVariant}
         />
