@@ -2,11 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --apple-green: #61BB46;
+  --apple-yellow: #FDB827;
+  --apple-orange: #F5821F;
+  --apple-red: #E03A3E;
+  --apple-purple: #963D97;
+  --apple-blue: #009DDC;
+}
+
 @layer base {
   body {
-    @apply font-sans bg-slate-50 text-slate-800;
+    @apply font-sans bg-[#F7F8FA] text-[#202124];
     -webkit-tap-highlight-color: transparent;
   }
+}
+
+.font-kannada { font-family: 'Noto Sans Kannada', -apple-system, sans-serif; }
+.font-devanagari { font-family: 'Noto Sans Devanagari', -apple-system, sans-serif; }
+.font-tamil { font-family: 'Noto Sans Tamil', -apple-system, sans-serif; }
+.font-telugu { font-family: 'Noto Sans Telugu', -apple-system, sans-serif; }
+
+/* Apple 6-Band Logo Horizontal Stripes */
+.apple-stripes-horizontal {
+  background: linear-gradient(to bottom,
+    #61BB46 0%, #61BB46 16.6%,
+    #FDB827 16.6%, #FDB827 33.3%,
+    #F5821F 33.3%, #F5821F 50%,
+    #E03A3E 50%, #E03A3E 66.6%,
+    #963D97 66.6%, #963D97 83.3%,
+    #009DDC 83.3%, #009DDC 100%
+  );
+}
+
+/* Apple Refined Multi-Band Gradient Button */
+.apple-gradient-btn {
+  background: linear-gradient(135deg, #F5821F 0%, #E03A3E 45%, #963D97 100%);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.apple-gradient-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px -4px rgba(224, 58, 62, 0.38);
+}
+.apple-gradient-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Apple Ambient Soft Shadow */
+.soft-shadow {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+}
+
+.soft-shadow-lg {
+  box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.06), 0 4px 10px -2px rgba(0, 0, 0, 0.03);
 }
 
 /* Custom scrollbars */
@@ -18,9 +66,9 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #E5E7EB;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #D1D5DB;
 }

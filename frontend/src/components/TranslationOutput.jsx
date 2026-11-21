@@ -55,8 +55,8 @@ export default function TranslationOutput({
   const getModelLabel = () => {
     if (translationMode === 'offline') {
       return isLocalFallback
-        ? 'Bundled Local Phrase Dictionary'
-        : 'Google ML Kit (On-Device Neural Model)';
+        ? 'Offline NLP Cache'
+        : 'Offline Pure-NLP Engine';
     }
     switch (modelVariant) {
       case 'lora_bt':
@@ -85,12 +85,12 @@ export default function TranslationOutput({
             })
           </span>
 
-          {/* Mode Badge: Online Backend vs Offline On-Device Model */}
+          {/* Mode Badge: Online Backend vs Offline Pure-NLP Engine */}
           {translatedText && !isLoading && (
             translationMode === 'offline' ? (
               <span className="inline-flex items-center space-x-1 text-xs font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-300 shadow-xs animate-fadeIn">
                 <Smartphone className="w-3.5 h-3.5 text-amber-600" />
-                <span>{isLocalFallback ? 'Local Offline Fallback' : 'ML Kit On-Device Model'}</span>
+                <span>{isLocalFallback ? 'Offline NLP Cache' : 'Offline Pure-NLP Engine'}</span>
                 {isFallback && (
                   <span className="ml-1 text-[10px] text-amber-600 font-semibold">(Fallback)</span>
                 )}
@@ -98,7 +98,7 @@ export default function TranslationOutput({
             ) : (
               <span className="inline-flex items-center space-x-1 text-xs font-bold text-blue-800 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200 shadow-xs animate-fadeIn">
                 <Cloud className="w-3.5 h-3.5 text-blue-600" />
-                <span>Online Backend (NLLB/LoRA)</span>
+                <span>Online Python NLLB-200</span>
               </span>
             )
           )}

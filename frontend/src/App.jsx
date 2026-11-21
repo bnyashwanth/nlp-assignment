@@ -1,39 +1,32 @@
 /**
- * LinguaBridge AI - Main Application Component
- * ============================================
+ * LinguaBridge AI - Main Application Component (Apple-Inspired UI)
+ * ================================================================
  * Module: frontend/src/App.jsx
  * 
- * Assembles:
- * - Navbar (with real-time connectivity status & offline models button)
- * - LanguageSelector (language direction swapping & model architecture selection)
- * - TranslatorPanel (source text input & translation actions)
- * - TranslationOutput (target result with Online / Offline Mode Badge & latency)
- * - OfflineModelManager (English ↔ Kannada model pack download/delete management)
- * - ModelComparison (3-way comparative evaluation)
- * - HistoryPanel (persisted translation history with mode badges)
- * - MetricsModal (empirical SacreBLEU / chrF++ evaluation metrics)
+ * Features:
+ * - Desktop 1440px wide Apple layout with 270px Sidebar and rounded-[28px] canvas
+ * - Responsive mobile & Capacitor support with seamless touch navigation
+ * - Multi-tab view routing: Translate, History, Languages, Saved, Settings
+ * - Full 22RI52 Indic multilingual support (English, Kannada, Hindi, Tamil, Telugu)
+ * - Hybrid routing: Online NLLB-200/LoRA FastAPI backend + On-device ML Kit / Local Fallback
+ * - Empirical SacreBLEU & chrF++ benchmark modals and offline model pack management
  */
 
-import React from 'react';
-import Navbar from './components/Navbar';
-import LanguageSelector from './components/LanguageSelector';
-import TranslatorPanel from './components/TranslatorPanel';
-import TranslationOutput from './components/TranslationOutput';
+import React, { useState, useEffect } from 'react';
+import Sidebar from './components/Sidebar';
+import TranslateView from './components/TranslateView';
+import HistoryView from './components/HistoryView';
+import LanguagesView from './components/LanguagesView';
+import SavedView from './components/SavedView';
+import SettingsView from './components/SettingsView';
 import ModelComparison from './components/ModelComparison';
-import HistoryPanel from './components/HistoryPanel';
 import MetricsModal from './components/MetricsModal';
 import OfflineModelManager from './components/OfflineModelManager';
 import { useTranslation } from './hooks/useTranslation';
-import {
-  AlertCircle,
-  X,
-  HardDrive,
-  WifiOff,
-  ChevronDown,
-  ChevronUp,
-  Smartphone,
-  Cloud,
-} from 'lucide-react';
+import { clearTranslationCache } from './services/translationCache';
+import { WifiOff, AlertCircle, X, Check } from 'lucide-react';
+
+const SAVED_STORAGE_KEY = 'linguabridge_saved_translations';
 
 export default function App() {
   const {
@@ -56,6 +49,7 @@ export default function App() {
     isFallback,
     isLocalFallback,
     latency,
+    nlpDiagnostics,
 
     // Loading & Errors
     isLoading,
@@ -69,12 +63,8 @@ export default function App() {
     history,
     showMetricsModal,
     setShowMetricsModal,
-    showHistoryModal,
-    setShowHistoryModal,
     showOfflineModelsModal,
     setShowOfflineModelsModal,
-    showInlineOfflineControls,
-    setShowInlineOfflineControls,
 
     // Handlers
     swapLanguages,
@@ -87,166 +77,242 @@ export default function App() {
     selectHistoryItem,
   } = useTranslation();
 
+  // Active navigation tab: 'translate' | 'history' | 'languages' | 'saved' | 'settings'
+  const [activeTab, setActiveTab] = useState('translate');
+
+  // Saved translations count for sidebar badge
+  const [savedCount, setSavedCount] = useState(() => {
+    try {
+      const stored = localStorage.getItem(SAVED_STORAGE_KEY);
+      return stored ? JSON.parse(stored).length : 4;
+    } catch {
+      return 4;
+    }
+  });
+
+  // Track if current translation is saved
+  const [isCurrentSaved, setIsCurrentSaved] = useState(false);
+  const [saveToast, setSaveToast] = useState(false);
+
+  // Bookmark current translation into Saved translations
+  const handleSaveCurrent = () => {
+    if (!translatedText || !sourceText) return;
+
+    try {
+      const stored = localStorage.getItem(SAVED_STORAGE_KEY);
+      const items = stored ? JSON.parse(stored) : [];
+
+      const srcCode = sourceLang.split('_')[0].toUpperCase();
+      const tgtCode = targetLang.split('_')[0].toUpperCase();
+
+      const newItem = {
+        id: `saved-${Date.now()}`,
+        sourceText,
+        translatedText,
+        sourceLang,
+        targetLang,
+        category: targetLang === 'kan_Knda' ? 'Kannada' : targetLang === 'hin_Deva' ? 'Hindi' : 'Tamil & Telugu',
+        engine: translationMode === 'offline' ? 'Offline Pure-NLP Engine' : 'Online Python NLLB-200',
+        pairBadge: `${srcCode} → ${tgtCode}`,
+        badgeBg: targetLang === 'kan_Knda' ? 'bg-[#FDB827]/15' : targetLang === 'hin_Deva' ? 'bg-[#E03A3E]/10' : targetLang === 'tam_Taml' ? 'bg-[#963D97]/10' : 'bg-[#009DDC]/10',
+        badgeText: targetLang === 'kan_Knda' ? 'text-[#9E6E00]' : targetLang === 'hin_Deva' ? 'text-[#E03A3E]' : targetLang === 'tam_Taml' ? 'text-[#963D97]' : 'text-[#009DDC]',
+        badgeBorder: targetLang === 'kan_Knda' ? 'border-[#FDB827]/30' : targetLang === 'hin_Deva' ? 'border-[#E03A3E]/20' : targetLang === 'tam_Taml' ? 'border-[#963D97]/20' : 'border-[#009DDC]/20',
+        fontClass: targetLang === 'kan_Knda' ? 'font-kannada' : targetLang === 'hin_Deva' ? 'font-devanagari' : targetLang === 'tam_Taml' ? 'font-tamil' : targetLang === 'tel_Telu' ? 'font-telugu' : 'font-sans',
+      };
+
+      const updated = [newItem, ...items];
+      localStorage.setItem(SAVED_STORAGE_KEY, JSON.stringify(updated));
+      setSavedCount(updated.length);
+      setIsCurrentSaved(true);
+      setSaveToast(true);
+      setTimeout(() => setSaveToast(false), 2000);
+    } catch (e) {
+      console.warn('Failed to save translation:', e);
+    }
+  };
+
+  // Reset saved status when text changes
+  useEffect(() => {
+    setIsCurrentSaved(false);
+  }, [sourceText, translatedText]);
+
+  // Handle selecting a language from Languages view
+  const handleSelectLanguageFromDirectory = (langCode, role = 'target') => {
+    if (role === 'target') {
+      changeTargetLanguage(langCode);
+    } else {
+      changeSourceLanguage(langCode);
+    }
+    setActiveTab('translate');
+  };
+
+  // Handle applying a sample from Languages directory
+  const handleApplySampleFromDirectory = (sampleText, srcCode, tgtCode) => {
+    changeSourceLanguage(srcCode);
+    changeTargetLanguage(tgtCode);
+    setSourceText(sampleText);
+    setActiveTab('translate');
+  };
+
+  // Handle selecting an item from History or Saved to translate
+  const handleSelectToTranslate = (item) => {
+    setSourceText(item.sourceText);
+    if (item.sourceLang) changeSourceLanguage(item.sourceLang);
+    if (item.targetLang) changeTargetLanguage(item.targetLang);
+    setActiveTab('translate');
+  };
+
+  const handleClearCache = () => {
+    clearTranslationCache();
+    alert('Local translation cache successfully cleared.');
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#EBECEF] p-2 sm:p-5 lg:p-7 flex justify-center items-center font-sans antialiased">
       
-      {/* Top Navigation */}
-      <Navbar
-        onOpenMetrics={() => setShowMetricsModal(true)}
-        onOpenHistory={() => setShowHistoryModal(true)}
-        onOpenOfflineModels={() => setShowOfflineModelsModal(true)}
-        historyCount={history.length}
-        isConnected={isConnected}
-        isNative={isNative}
-      />
-
-      {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      {/* Apple Desktop App Canvas (1440px wide max, rounded-[28px], soft shadow) */}
+      <div className="w-full max-w-[1440px] min-h-[920px] bg-[#F7F8FA] rounded-[22px] sm:rounded-[28px] border border-[#E2E4E9] shadow-2xl flex flex-col lg:flex-row overflow-hidden relative">
         
-        {/* Offline Connectivity Notice Banner */}
-        {!isConnected && (
-          <div className="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-sm flex items-center justify-between shadow-sm animate-fadeIn">
-            <div className="flex items-center space-x-2.5">
-              <WifiOff className="w-5 h-5 text-amber-600 shrink-0" />
-              <div>
-                <span className="font-bold">Offline Mode Active.</span>{' '}
-                <span>
-                  {isNative
-                    ? 'Translations will run on-device using local ML Kit models.'
-                    : 'Web browser is offline. Please reconnect to access the online FastAPI backend.'}
-                </span>
-              </div>
-            </div>
-            {isNative && (
-              <button
-                type="button"
-                onClick={() => setShowOfflineModelsModal(true)}
-                className="text-xs font-semibold px-3 py-1 bg-amber-200/80 hover:bg-amber-300 text-amber-900 rounded-lg transition-colors shrink-0 ml-3"
-              >
-                Manage Models
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Error Alert Banner */}
-        {error && (
-          <div className="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-start justify-between shadow-sm animate-fadeIn">
-            <div className="flex items-center space-x-2.5">
-              <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
-              <span>{error}</span>
-            </div>
-            <button
-              onClick={() => setError(null)}
-              className="text-rose-400 hover:text-rose-600 p-1"
-              title="Dismiss error"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        )}
-
-        {/* Quick Offline Model Pack Toggle Bar */}
-        <div className="mb-4 flex items-center justify-between bg-white px-4 py-2.5 rounded-xl border border-slate-200/80 shadow-xs text-xs">
-          <div className="flex items-center space-x-2 text-slate-600">
-            <HardDrive className="w-4 h-4 text-brand-600" />
-            <span className="font-semibold text-slate-800">Offline Model Packs:</span>
-            <span>English ↔ Kannada & Hindi (~30MB each)</span>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <button
-              type="button"
-              onClick={() => setShowInlineOfflineControls((prev) => !prev)}
-              className="inline-flex items-center space-x-1 font-semibold text-brand-600 hover:text-brand-700 py-1 px-2 rounded-lg hover:bg-brand-50 transition-colors"
-            >
-              <span>{showInlineOfflineControls ? 'Hide Controls' : 'Show Controls'}</span>
-              {showInlineOfflineControls ? (
-                <ChevronUp className="w-3.5 h-3.5" />
-              ) : (
-                <ChevronDown className="w-3.5 h-3.5" />
-              )}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShowOfflineModelsModal(true)}
-              className="text-slate-500 hover:text-slate-800 font-medium py-1 px-2 rounded-lg hover:bg-slate-100 transition-colors hidden sm:inline"
-            >
-              Open Dialog
-            </button>
-          </div>
-        </div>
-
-        {/* Inline Offline Model Manager (collapsible) */}
-        {showInlineOfflineControls && (
-          <OfflineModelManager isInline={true} />
-        )}
-
-        {/* Language & Architecture Controls */}
-        <LanguageSelector
-          sourceLang={sourceLang}
-          targetLang={targetLang}
-          onSwap={swapLanguages}
-          onChangeSource={changeSourceLanguage}
-          onChangeTarget={changeTargetLanguage}
-          modelVariant={modelVariant}
-          onModelChange={setModelVariant}
+        {/* Left Sidebar (Desktop & Mobile Header) */}
+        <Sidebar
+          activeTab={activeTab}
+          onSelectTab={setActiveTab}
+          isConnected={isConnected}
+          isNative={isNative}
+          historyCount={history.length}
+          savedCount={savedCount}
+          onOpenMetrics={() => setShowMetricsModal(true)}
+          onOpenOfflineModels={() => setShowOfflineModelsModal(true)}
         />
 
-        {/* Dual-Pane Translator Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        {/* Main Workspace Area */}
+        <main className="flex-1 overflow-y-auto p-5 sm:p-8 lg:p-10 flex flex-col justify-between">
           
-          {/* Source Input Panel */}
-          <TranslatorPanel
-            sourceText={sourceText}
-            onChangeText={setSourceText}
-            onTranslate={handleTranslate}
-            onCompare={handleCompare}
-            onClear={clearText}
-            isLoading={isLoading}
-            isComparing={isComparing}
-            sourceLang={sourceLang}
-          />
+          <div className="space-y-4">
+            
+            {/* Offline Connectivity Notice Banner */}
+            {!isConnected && (
+              <div className="p-3.5 rounded-[16px] bg-[#61BB46]/10 border border-[#61BB46]/30 text-[#30701F] text-xs font-medium flex items-center justify-between soft-shadow animate-fadeIn">
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 rounded-full bg-[#61BB46] animate-pulse shrink-0"></span>
+                  <span>
+                    <strong>Pure-NLP Offline Mode:</strong> Using built-in 22RI52 tokenization, Levenshtein typo snapping & parallel corpus (0 MB download required).
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowOfflineModelsModal(true)}
+                  className="text-[11px] font-semibold px-2.5 py-1 bg-[#61BB46]/20 hover:bg-[#61BB46]/30 text-[#30701F] rounded-[8px] transition-colors ml-2 shrink-0"
+                >
+                  Engine Status
+                </button>
+              </div>
+            )}
 
-          {/* Target Output Panel (With Mode Badge: Online Backend vs Offline On-Device Model) */}
-          <TranslationOutput
-            translatedText={translatedText}
-            isLoading={isLoading}
-            targetLang={targetLang}
-            modelVariant={modelVariant}
-            latency={latency}
-            translationMode={translationMode}
-            translationEngine={translationEngine}
-            isFallback={isFallback}
-            isLocalFallback={isLocalFallback}
-          />
+            {/* Error Notification Banner */}
+            {error && (
+              <div className="p-3.5 rounded-[16px] bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center justify-between soft-shadow animate-fadeIn">
+                <div className="flex items-center space-x-2">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span>{error}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setError(null)}
+                  className="text-rose-400 hover:text-rose-600 p-1"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
 
-        </div>
+            {/* Bookmark Toast Alert */}
+            {saveToast && (
+              <div className="p-3 rounded-[14px] bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center space-x-2 soft-shadow animate-fadeIn">
+                <Check className="w-4 h-4 text-emerald-600" />
+                <span>Saved translation bookmarked to Saved tab!</span>
+              </div>
+            )}
 
-        {/* Side-by-Side Architectural Comparison Section */}
-        {comparisonData && (
-          <ModelComparison
-            comparisonData={comparisonData}
-            onClose={() => handleCompare(null)}
-          />
-        )}
+            {/* Active Tab View Rendering */}
+            {activeTab === 'translate' && (
+              <TranslateView
+                sourceText={sourceText}
+                onChangeText={setSourceText}
+                translatedText={translatedText}
+                sourceLang={sourceLang}
+                targetLang={targetLang}
+                onChangeSource={changeSourceLanguage}
+                onChangeTarget={changeTargetLanguage}
+                onSwap={swapLanguages}
+                modelVariant={modelVariant}
+                onModelChange={setModelVariant}
+                onTranslate={handleTranslate}
+                onCompare={handleCompare}
+                onClear={clearText}
+                isLoading={isLoading}
+                isComparing={isComparing}
+                latency={latency}
+                translationMode={translationMode}
+                translationEngine={translationEngine}
+                nlpDiagnostics={nlpDiagnostics}
+                isFallback={isFallback}
+                isLocalFallback={isLocalFallback}
+                isConnected={isConnected}
+                isNative={isNative}
+                onSwitchTab={setActiveTab}
+                onSaveTranslation={handleSaveCurrent}
+                isSaved={isCurrentSaved}
+              />
+            )}
 
-      </main>
+            {activeTab === 'history' && (
+              <HistoryView
+                history={history}
+                onSelectHistoryItem={(item) => {
+                  selectHistoryItem(item);
+                  setActiveTab('translate');
+                }}
+                onClearHistory={clearHistory}
+              />
+            )}
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-6 mt-12 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 space-y-1">
-          <p className="font-medium text-slate-600">
-            LinguaBridge AI &bull; English ↔ Kannada Low-Resource Neural Machine Translation
-          </p>
-          <p className="flex items-center justify-center space-x-2 text-slate-400">
-            <span>Online Backend: NLLB-200 + LoRA PEFT (r=16, alpha=32)</span>
-            <span>&bull;</span>
-            <span>Offline Mobile: Google ML Kit Translation</span>
-          </p>
-        </div>
-      </footer>
+            {activeTab === 'languages' && (
+              <LanguagesView
+                onSelectLanguage={handleSelectLanguageFromDirectory}
+                onApplySample={handleApplySampleFromDirectory}
+                currentSource={sourceLang}
+                currentTarget={targetLang}
+              />
+            )}
+
+            {activeTab === 'saved' && (
+              <SavedView onSelectToTranslate={handleSelectToTranslate} />
+            )}
+
+            {activeTab === 'settings' && (
+              <SettingsView
+                onClearCache={handleClearCache}
+                onClearHistory={clearHistory}
+                onOpenMetrics={() => setShowMetricsModal(true)}
+                onOpenOfflineModels={() => setShowOfflineModelsModal(true)}
+              />
+            )}
+
+          </div>
+
+          {/* Side-by-Side Model Comparison Section (if active) */}
+          {comparisonData && (
+            <div className="mt-6">
+              <ModelComparison
+                comparisonData={comparisonData}
+                onClose={() => handleCompare(null)}
+              />
+            </div>
+          )}
+
+        </main>
+      </div>
 
       {/* Offline Model Manager Modal Dialog */}
       <OfflineModelManager
@@ -255,16 +321,7 @@ export default function App() {
         isInline={false}
       />
 
-      {/* Translation History Modal */}
-      <HistoryPanel
-        isOpen={showHistoryModal}
-        onClose={() => setShowHistoryModal(false)}
-        history={history}
-        onSelect={selectHistoryItem}
-        onClear={clearHistory}
-      />
-
-      {/* Benchmark Metrics Modal */}
+      {/* Empirical SacreBLEU & chrF++ Metrics Modal */}
       <MetricsModal
         isOpen={showMetricsModal}
         onClose={() => setShowMetricsModal(false)}

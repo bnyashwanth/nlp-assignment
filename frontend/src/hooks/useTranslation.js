@@ -39,6 +39,7 @@ export function useTranslation() {
   const [isFallback, setIsFallback] = useState(false);
   const [isLocalFallback, setIsLocalFallback] = useState(false);
   const [latency, setLatency] = useState(null);
+  const [nlpDiagnostics, setNlpDiagnostics] = useState(null);
 
   // UI Loading & Error States
   const [isLoading, setIsLoading] = useState(false);
@@ -128,12 +129,13 @@ export function useTranslation() {
     setComparisonData(null);
     setIsFallback(false);
     setIsLocalFallback(false);
+    setNlpDiagnostics(null);
   }, []);
 
   /**
    * Executes hybrid translation:
-   * - When online: routes to FastAPI backend; if unreachable on native platform, falls back to on-device ML Kit.
-   * - When offline: routes directly to on-device ML Kit translation (native) or informs web user cleanly.
+   * - When online: routes to FastAPI backend; if unreachable or times out, falls back to offline pure-NLP engine.
+   * - When offline: routes directly to pure-NLP engine (Exp 1, 2, 3) or cached entries without error.
    */
   const handleTranslate = useCallback(async (customText = null) => {
     const textToTranslate = (customText !== null ? customText : sourceText).trim();
@@ -155,9 +157,10 @@ export function useTranslation() {
       setTranslatedText(response.translated_text);
       setLatency(response.latency_ms);
       setTranslationMode(response.mode || (isConnected ? 'online' : 'offline'));
-      setTranslationEngine(response.engine || (isConnected ? 'Online Backend (NLLB/LoRA)' : 'Offline On-Device Model'));
+      setTranslationEngine(response.engine || (isConnected ? 'Online Python NLLB-200' : 'Offline Pure-NLP Engine'));
       setIsFallback(Boolean(response.isFallback));
       setIsLocalFallback(Boolean(response.isLocalFallback));
+      setNlpDiagnostics(response.diagnostics || null);
 
       // Append to history with mode metadata
       const newHistoryItem = {
@@ -263,6 +266,7 @@ export function useTranslation() {
     isFallback,
     isLocalFallback,
     latency,
+    nlpDiagnostics,
 
     // Processing & Errors
     isLoading,
