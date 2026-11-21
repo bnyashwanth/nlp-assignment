@@ -28,14 +28,14 @@ export default function MetricsModal({ isOpen, onClose, metricsData }) {
       <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
         
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+        <div className="px-6 py-4 border-b border-[#E5E5EA] flex items-center justify-between bg-[#F5F5F7]">
           <div className="flex items-center space-x-2.5">
-            <BarChart3 className="w-5 h-5 text-brand-600" />
-            <h3 className="font-bold text-slate-900 text-base">Benchmark Evaluation (SacreBLEU & chrF++)</h3>
+            <BarChart3 className="w-5 h-5 text-[#0F766E]" />
+            <h3 className="font-bold text-[#1D1D1F] text-base">Benchmark Evaluation (SacreBLEU & chrF++)</h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+            className="p-1 rounded-lg text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#E5E5EA] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -44,15 +44,15 @@ export default function MetricsModal({ isOpen, onClose, metricsData }) {
         {/* Content Body */}
         <div className="p-6 overflow-y-auto space-y-6">
           
-          <p className="text-xs text-slate-600 leading-relaxed">
+          <p className="text-xs text-[#6E6E73] leading-relaxed">
             Evaluated on held-out test split of English ↔ Kannada sentences using standardized 
-            <strong> SacreBLEU</strong> (word-level n-gram precision) and <strong>chrF++</strong> (character n-gram F-score).
+            <strong className="text-[#1D1D1F]"> SacreBLEU</strong> (word-level n-gram precision) and <strong className="text-[#1D1D1F]">chrF++</strong> (character n-gram F-score).
           </p>
 
           {/* Benchmark Table */}
-          <div className="rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+          <div className="rounded-xl border border-[#E5E5EA] overflow-hidden shadow-sm">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-100 text-slate-700 font-semibold text-xs uppercase tracking-wider">
+              <thead className="bg-[#F5F5F7] text-[#1D1D1F] font-semibold text-xs uppercase tracking-wider">
                 <tr>
                   <th className="py-3 px-4">System Architecture</th>
                   <th className="py-3 px-4">SacreBLEU (↑)</th>
@@ -60,43 +60,43 @@ export default function MetricsModal({ isOpen, onClose, metricsData }) {
                   <th className="py-3 px-4">Relative Gain</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-mono text-xs">
+              <tbody className="divide-y divide-[#E5E5EA] font-mono text-xs">
                 
                 {/* 1. Baseline */}
-                <tr className="hover:bg-slate-50/60">
-                  <td className="py-3 px-4 font-sans font-medium text-slate-700">
+                <tr className="hover:bg-[#F5F5F7]">
+                  <td className="py-3 px-4 font-sans font-medium text-[#1D1D1F]">
                     1. Baseline Pretrained NLLB-200
                   </td>
-                  <td className="py-3 px-4 text-slate-600">{systems.baseline_pretrained?.bleu}</td>
-                  <td className="py-3 px-4 text-slate-600">{systems.baseline_pretrained?.chrf}</td>
-                  <td className="py-3 px-4 text-slate-400 font-sans">Reference</td>
+                  <td className="py-3 px-4 text-[#6E6E73]">{systems.baseline_pretrained?.bleu}</td>
+                  <td className="py-3 px-4 text-[#6E6E73]">{systems.baseline_pretrained?.chrf}</td>
+                  <td className="py-3 px-4 text-[#6E6E73] font-sans">Reference</td>
                 </tr>
 
                 {/* 2. LoRA Fine-Tuned */}
-                <tr className="hover:bg-slate-50/60">
-                  <td className="py-3 px-4 font-sans font-medium text-slate-800">
+                <tr className="hover:bg-[#F5F5F7]">
+                  <td className="py-3 px-4 font-sans font-medium text-[#1D1D1F]">
                     2. LoRA Fine-Tuned (Parallel Only)
                   </td>
-                  <td className="py-3 px-4 font-bold text-blue-700">{systems.lora_finetuned?.bleu}</td>
-                  <td className="py-3 px-4 font-bold text-blue-700">{systems.lora_finetuned?.chrf}</td>
-                  <td className="py-3 px-4 font-sans text-blue-600 font-semibold">
+                  <td className="py-3 px-4 font-bold text-[#1D1D1F]">{systems.lora_finetuned?.bleu}</td>
+                  <td className="py-3 px-4 font-bold text-[#1D1D1F]">{systems.lora_finetuned?.chrf}</td>
+                  <td className="py-3 px-4 font-sans text-[#0F766E] font-semibold">
                     {improvements.lora_vs_baseline?.bleu_gain_percentage || '+39.8%'}
                   </td>
                 </tr>
 
                 {/* 3. LoRA + Back-Translation */}
-                <tr className="bg-emerald-50/60 font-semibold">
-                  <td className="py-3 px-4 font-sans text-emerald-950 flex items-center space-x-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <tr className="bg-[#F0FDFA] font-semibold">
+                  <td className="py-3 px-4 font-sans text-[#0F766E] flex items-center space-x-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-[#0F766E] shrink-0" />
                     <span>3. LoRA + Back-Translation</span>
                   </td>
-                  <td className="py-3 px-4 text-emerald-700 font-bold text-sm">
+                  <td className="py-3 px-4 text-[#0F766E] font-bold text-sm">
                     {systems.lora_backtranslation?.bleu}
                   </td>
-                  <td className="py-3 px-4 text-emerald-700 font-bold text-sm">
+                  <td className="py-3 px-4 text-[#0F766E] font-bold text-sm">
                     {systems.lora_backtranslation?.chrf}
                   </td>
-                  <td className="py-3 px-4 font-sans text-emerald-800 font-bold">
+                  <td className="py-3 px-4 font-sans text-[#0F766E] font-bold">
                     ⭐ Best ({improvements.lora_bt_vs_baseline?.bleu_gain_percentage || '+59.1%'})
                   </td>
                 </tr>
@@ -106,42 +106,42 @@ export default function MetricsModal({ isOpen, onClose, metricsData }) {
           </div>
 
           {/* Morphological Rationale Callout */}
-          <div className="bg-amber-50/70 border border-amber-200/80 rounded-xl p-4 text-xs text-amber-900 space-y-2">
-            <div className="flex items-center space-x-1.5 font-bold text-amber-950">
-              <Info className="w-4 h-4 text-amber-600" />
+          <div className="bg-[#F5F5F7] border border-[#E5E5EA] rounded-xl p-4 text-xs text-[#1D1D1F] space-y-2">
+            <div className="flex items-center space-x-1.5 font-bold text-[#1D1D1F]">
+              <Info className="w-4 h-4 text-[#0F766E]" />
               <span>Why chrF++ is Essential for Kannada</span>
             </div>
-            <p className="leading-relaxed">
+            <p className="leading-relaxed text-[#6E6E73]">
               Kannada is a synthetic, agglutinative Dravidian language with extensive case inflections (<em>vibhakti pratyaya</em>). 
               Word-level BLEU severely penalizes exact root matches if suffixes differ slightly (e.g. <em>ಶಾಲೆ</em> vs <em>ಶಾಲೆಗಳಿಂದ</em>). 
-              <strong> chrF++ evaluates character n-grams</strong>, granting partial credit for shared morphological stems and yielding a 
+              <strong className="text-[#1D1D1F]"> chrF++ evaluates character n-grams</strong>, granting partial credit for shared morphological stems and yielding a 
               substantially more accurate measure of semantic fluency.
             </p>
           </div>
 
           {/* Dataset & Parameter Highlights */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-center">
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-              <div className="text-lg font-bold text-slate-800 font-mono">~3,500</div>
-              <div className="text-[11px] text-slate-500">Parallel Pairs (80/10/10)</div>
+            <div className="bg-[#F5F5F7] p-3 rounded-xl border border-[#E5E5EA]">
+              <div className="text-lg font-bold text-[#1D1D1F] font-mono">~3,500</div>
+              <div className="text-[11px] text-[#6E6E73]">Parallel Pairs (80/10/10)</div>
             </div>
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-              <div className="text-lg font-bold text-brand-600 font-mono">&lt; 1%</div>
-              <div className="text-[11px] text-slate-500">Trainable LoRA Params</div>
+            <div className="bg-[#F5F5F7] p-3 rounded-xl border border-[#E5E5EA]">
+              <div className="text-lg font-bold text-[#0F766E] font-mono">&lt; 1%</div>
+              <div className="text-[11px] text-[#6E6E73]">Trainable LoRA Params</div>
             </div>
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 col-span-2 sm:col-span-1">
-              <div className="text-lg font-bold text-emerald-600 font-mono">+16.60</div>
-              <div className="text-[11px] text-slate-500">chrF Point Improvement</div>
+            <div className="bg-[#F5F5F7] p-3 rounded-xl border border-[#E5E5EA] col-span-2 sm:col-span-1">
+              <div className="text-lg font-bold text-[#0F766E] font-mono">+16.60</div>
+              <div className="text-[11px] text-[#6E6E73]">chrF Point Improvement</div>
             </div>
           </div>
 
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 bg-slate-50 border-t border-slate-100 flex justify-end">
+        <div className="px-6 py-3 bg-[#F5F5F7] border-t border-[#E5E5EA] flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-xs font-semibold text-slate-800 transition-colors"
+            className="px-4 py-1.5 rounded-xl bg-[#1D1D1F] hover:bg-black text-xs font-semibold text-white transition-colors"
           >
             Close
           </button>

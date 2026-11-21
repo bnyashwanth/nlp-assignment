@@ -1,13 +1,12 @@
 /**
- * LinguaBridge AI - Saved Translations View
- * ==========================================
+ * LinguaBridge AI - Saved Translations View (3-Color System)
+ * ==========================================================
  * Module: frontend/src/components/SavedView.jsx
  * 
- * Features:
- * - Category filter pills (All saved, Kannada, Hindi, Tamil & Telugu, Phrases)
- * - Direction badges (ENG → KAN, ENG → HIN, ENG → TAM, ENG → TEL)
- * - Copy to clipboard, delete item, and "Translate Again" action
- * - Persisted in browser localStorage
+ * Strict 3-Color System:
+ * - Surface: Crisp White (#FFFFFF) & Soft Off-White (#F5F5F7), Border (#E5E5EA)
+ * - Primary Ink: Deep Charcoal (#1D1D1F), Secondary: Muted Gray (#6E6E73)
+ * - Single Accent: Deep Teal (#0F766E)
  */
 
 import React, { useState } from 'react';
@@ -21,11 +20,8 @@ const DEFAULT_SAVED_ITEMS = [
     sourceLang: 'eng_Latn',
     targetLang: 'kan_Knda',
     category: 'Kannada',
-    engine: 'NLLB/LoRA',
+    engine: '22RI52 Pure-NLP',
     pairBadge: 'ENG → KAN',
-    badgeBg: 'bg-[#FDB827]/15',
-    badgeText: 'text-[#9E6E00]',
-    badgeBorder: 'border-[#FDB827]/30',
     fontClass: 'font-kannada',
   },
   {
@@ -35,11 +31,8 @@ const DEFAULT_SAVED_ITEMS = [
     sourceLang: 'eng_Latn',
     targetLang: 'hin_Deva',
     category: 'Hindi',
-    engine: 'Offline Cache',
+    engine: 'Offline NLP Cache',
     pairBadge: 'ENG → HIN',
-    badgeBg: 'bg-[#E03A3E]/10',
-    badgeText: 'text-[#E03A3E]',
-    badgeBorder: 'border-[#E03A3E]/20',
     fontClass: 'font-devanagari',
   },
   {
@@ -49,11 +42,8 @@ const DEFAULT_SAVED_ITEMS = [
     sourceLang: 'eng_Latn',
     targetLang: 'tam_Taml',
     category: 'Tamil & Telugu',
-    engine: 'NLLB/LoRA',
+    engine: '22RI52 Pure-NLP',
     pairBadge: 'ENG → TAM',
-    badgeBg: 'bg-[#963D97]/10',
-    badgeText: 'text-[#963D97]',
-    badgeBorder: 'border-[#963D97]/20',
     fontClass: 'font-tamil',
   },
   {
@@ -63,11 +53,8 @@ const DEFAULT_SAVED_ITEMS = [
     sourceLang: 'eng_Latn',
     targetLang: 'tel_Telu',
     category: 'Tamil & Telugu',
-    engine: 'NLLB/LoRA',
+    engine: '22RI52 Pure-NLP',
     pairBadge: 'ENG → TEL',
-    badgeBg: 'bg-[#009DDC]/10',
-    badgeText: 'text-[#009DDC]',
-    badgeBorder: 'border-[#009DDC]/20',
     fontClass: 'font-telugu',
   },
 ];
@@ -132,10 +119,10 @@ export default function SavedView({ onSelectToTranslate }) {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#202124]">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1D1D1F]">
           Words worth keeping.
         </h2>
-        <p className="text-sm text-[#858B98] mt-1">
+        <p className="text-sm text-[#6E6E73] mt-1">
           Your saved English, Kannada, Hindi, Tamil, and Telugu translations.
         </p>
       </div>
@@ -148,10 +135,10 @@ export default function SavedView({ onSelectToTranslate }) {
               key={cat}
               type="button"
               onClick={() => setFilterCategory(cat)}
-              className={`px-3.5 py-1.5 rounded-[12px] text-xs font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-[10px] text-xs font-semibold transition-all ${
                 filterCategory === cat
-                  ? 'bg-white text-[#202124] border border-[#E5E7EB] soft-shadow'
-                  : 'text-[#858B98] hover:text-[#202124] hover:bg-[#F0F2F6]'
+                  ? 'bg-[#1D1D1F] text-white shadow-xs'
+                  : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] border border-[#E5E5EA]'
               }`}
             >
               {cat} {cat === 'All' ? `(${savedItems.length})` : ''}
@@ -165,41 +152,39 @@ export default function SavedView({ onSelectToTranslate }) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Filter saved phrases..."
-            className="w-full sm:w-64 bg-white border border-[#E5E7EB] rounded-[14px] px-3.5 py-1.5 pl-8 text-xs text-[#202124] outline-none soft-shadow"
+            className="w-full sm:w-64 bg-white border border-[#E5E5EA] rounded-[12px] px-3.5 py-1.5 pl-8 text-xs text-[#1D1D1F] outline-none soft-shadow"
           />
-          <Search className="w-3.5 h-3.5 text-[#858B98] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-3.5 h-3.5 text-[#6E6E73] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
       </div>
 
       {/* Saved Translation Cards List */}
       <div className="space-y-3">
         {filteredItems.length === 0 ? (
-          <div className="p-12 text-center bg-white rounded-[20px] border border-[#E5E7EB] soft-shadow">
-            <Star className="w-8 h-8 text-[#FDB827]/60 mx-auto mb-2" />
-            <p className="text-sm font-semibold text-[#202124]">No saved translations found</p>
-            <p className="text-xs text-[#858B98] mt-1">
-              Click the star icon on any translation in the Translate tab to bookmark it here.
+          <div className="p-12 text-center bg-white rounded-[18px] border border-[#E5E5EA] soft-shadow">
+            <Star className="w-8 h-8 text-[#6E6E73]/40 mx-auto mb-2" />
+            <p className="text-sm font-semibold text-[#1D1D1F]">No saved translations found</p>
+            <p className="text-xs text-[#6E6E73] mt-1">
+              Click the star icon in the Translate tab to bookmark any translation here.
             </p>
           </div>
         ) : (
           filteredItems.map((item) => (
             <div
               key={item.id}
-              className="p-5 bg-white border border-[#E5E7EB] hover:border-[#FDB827]/60 rounded-[20px] soft-shadow transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
+              className="p-5 bg-white border border-[#E5E5EA] hover:border-[#0F766E] rounded-[18px] soft-shadow transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
             >
               <div className="space-y-1 min-w-0 flex-1">
                 <div className="flex items-center space-x-2">
-                  <span
-                    className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${item.badgeBg || 'bg-[#FDB827]/15'} ${item.badgeText || 'text-[#9E6E00]'} border ${item.badgeBorder || 'border-[#FDB827]/30'}`}
-                  >
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#F5F5F7] text-[#1D1D1F] border border-[#E5E5EA]">
                     {item.pairBadge || 'ENG → KAN'}
                   </span>
-                  <span className="text-[10px] font-medium text-[#858B98]">
-                    {item.engine || 'NLLB/LoRA'}
+                  <span className="text-[10px] font-medium text-[#6E6E73]">
+                    {item.engine || '22RI52 Pure-NLP'}
                   </span>
                 </div>
-                <p className="text-xs text-[#858B98]">{item.sourceText}</p>
-                <p className={`text-base ${item.fontClass || 'font-sans'} font-bold text-[#202124]`}>
+                <p className="text-xs text-[#6E6E73]">{item.sourceText}</p>
+                <p className={`text-base ${item.fontClass || 'font-sans'} font-bold text-[#1D1D1F]`}>
                   {item.translatedText}
                 </p>
               </div>
@@ -209,7 +194,7 @@ export default function SavedView({ onSelectToTranslate }) {
                 <button
                   type="button"
                   onClick={() => onSelectToTranslate && onSelectToTranslate(item)}
-                  className="p-2 rounded-xl text-[#858B98] hover:text-[#202124] hover:bg-[#F0F2F6] transition-colors"
+                  className="p-2 rounded-xl text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F5F5F7] transition-colors"
                   title="Open in translator"
                 >
                   <ArrowUpRight className="w-4 h-4" />
@@ -217,11 +202,11 @@ export default function SavedView({ onSelectToTranslate }) {
                 <button
                   type="button"
                   onClick={() => handleCopy(item.id, item.translatedText)}
-                  className="p-2 rounded-xl text-[#858B98] hover:text-[#202124] hover:bg-[#F0F2F6] transition-colors"
+                  className="p-2 rounded-xl text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F5F5F7] transition-colors"
                   title="Copy translation"
                 >
                   {copiedId === item.id ? (
-                    <Check className="w-4 h-4 text-emerald-600" />
+                    <Check className="w-4 h-4 text-[#0F766E]" />
                   ) : (
                     <Copy className="w-4 h-4" />
                   )}
@@ -229,7 +214,7 @@ export default function SavedView({ onSelectToTranslate }) {
                 <button
                   type="button"
                   onClick={() => handleDelete(item.id)}
-                  className="p-2 rounded-xl text-[#858B98] hover:text-[#E03A3E] hover:bg-rose-50 transition-colors"
+                  className="p-2 rounded-xl text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F5F5F7] transition-colors"
                   title="Remove from saved"
                 >
                   <Trash2 className="w-4 h-4" />
