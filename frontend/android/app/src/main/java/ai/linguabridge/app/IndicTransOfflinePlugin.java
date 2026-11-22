@@ -40,8 +40,10 @@ public class IndicTransOfflinePlugin extends Plugin {
     private JSONObject vocab;
     private Map<Integer, String> reverseVocab = new HashMap<>();
     private Map<String, Integer> specialTokens = new HashMap<>();
+    private boolean nllbFallback;
 
     private static final Map<String, String> FLORES_CODES = new HashMap<>();
+    private static final Map<String, String> SHORT_TO_FLORES = new HashMap<>();
     static {
         FLORES_CODES.put("eng_Latn", "en");
         FLORES_CODES.put("kan_Knda", "kn");
@@ -53,6 +55,11 @@ public class IndicTransOfflinePlugin extends Plugin {
         FLORES_CODES.put("hi", "hi");
         FLORES_CODES.put("ta", "ta");
         FLORES_CODES.put("te", "te");
+        SHORT_TO_FLORES.put("en", "eng_Latn");
+        SHORT_TO_FLORES.put("kn", "kan_Knda");
+        SHORT_TO_FLORES.put("hi", "hin_Deva");
+        SHORT_TO_FLORES.put("ta", "tam_Taml");
+        SHORT_TO_FLORES.put("te", "tel_Telu");
     }
 
     private synchronized void unloadModel() {
@@ -105,6 +112,35 @@ public class IndicTransOfflinePlugin extends Plugin {
         }
 
         loadVocabulary(new File(modelDir, "tokenizer.json"));
+        nllbFallback = false;
+        File metadataFile = new File(modelDir, "export_metadata.json");
+        if (metadataFile.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(metadataFile))) {
+                StringBuilder metadata = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) metadata.append(line);
+                nllbFallback = metadata.toString().toLowerCase().contains("nllb");
+            } catch (Exception metadataError) {
+                Log.w(TAG, "Could not read export metadata", metadataError);
+            }
+        }
+        File configFile = new File(modelDir, "config.json");
+        if (configFile.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(configFile))) {
+                StringBuilder configJson = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) configJson.append(line);
+                JSONObject config = new JSONObject(configJson.toString());
+                String modelType = config.optString("model_type", "").toLowerCase();
+                nllbFallback = "marian".equals(modelType)
+                    || "m2m_100".equals(modelType)
+                    || "nllb".equals(modelType)
+                    || "nllb_moe".equals(modelType)
+                    || configJson.toString().toLowerCase().contains("nllb");
+            } catch (Exception configError) {
+                Log.w(TAG, "Could not read NLLB fallback config", configError);
+            }
+        }
         loadedFamily = family;
         Log.i(TAG, "Loaded family " + family);
     }
@@ -159,8 +195,13 @@ public class IndicTransOfflinePlugin extends Plugin {
 
     private List<Integer> tokenize(String text, String sourceTag, String targetTag) {
         List<Integer> ids = new ArrayList<>();
-        ids.add(getTokenId("<" + sourceTag + ">", 256202));
-        ids.add(getTokenId("<" + targetTag + ">", 256200));
+        if (nllbFallback) {
+            String sourceFlores = SHORT_TO_FLORES.get(sourceTag);
+            ids.add(getTokenId(sourceFlores == null ? sourceTag : sourceFlores, 256202));
+        } else {
+            ids.add(getTokenId("<" + sourceTag + ">", 256202));
+            ids.add(getTokenId("<" + targetTag + ">", 256200));
+        }
 
         for (String rawWord : text.trim().split("\\s+")) {
             String word = rawWord.replaceAll("[\\p{Punct}]+$", "");
@@ -280,7 +321,9 @@ public class IndicTransOfflinePlugin extends Plugin {
             }
             encoderHidden = (OnnxTensor) hiddenValue;
 
-            int targetId = getTokenId("<" + targetTag + ">", 256200);
+            int targetId = nllbFallback
+                ? getTokenId(SHORT_TO_FLORES.get(targetTag), 256200)
+                : getTokenId("<" + targetTag + ">", 256200);
             List<Integer> generated = new ArrayList<>();
             generated.add(targetId);
             Map<String, OnnxTensor> cacheTensors = new HashMap<>();
