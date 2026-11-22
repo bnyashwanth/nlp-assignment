@@ -307,7 +307,7 @@ public class IndicTransOfflinePlugin extends Plugin {
             attention[i] = 1;
         }
 
-        OnnxTensor encoderHidden;
+        OnnxTensor encoderHidden = null;
         try (OrtSession.Result encoderResult = runEncoder(inputIds, attention)) {
             OnnxValue hiddenValue = null;
             for (Map.Entry<String, OnnxValue> entry : encoderResult) {
