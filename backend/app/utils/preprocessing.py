@@ -8,7 +8,7 @@ Purpose: Text normalization, Unicode NFC cleaning, and script character analysis
 
 import re
 import unicodedata
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple
 
 # Unicode codepoint blocks
 KANNADA_REGEX = re.compile(r"[\u0C80-\u0CFF]")
@@ -89,3 +89,50 @@ def truncate_text(text: str, max_chars: int) -> Tuple[str, bool]:
         truncated = truncated[:last_space]
 
     return truncated.strip(), True
+
+
+PARAGRAPH_BREAK_RE = re.compile(r"\n")
+SENTENCE_BREAK_RE = re.compile(r"(?<=[.!?।])\s+")
+
+
+def split_paragraphs_and_sentences(text: str) -> List[List[str]]:
+    """Split a paragraph while preserving every sentence for batched inference."""
+    normalized = normalize_text(text)
+    paragraphs = PARAGRAPH_BREAK_RE.split(normalized)
+    result: List[List[str]] = []
+    for paragraph in paragraphs:
+        clean = paragraph.strip()
+        if not clean:
+            continue
+        sentences = [sentence.strip() for sentence in SENTENCE_BREAK_RE.split(clean) if sentence.strip()]
+        if sentences:
+            result.append(sentences)
+    return result
+
+
+def _get_indic_processor():
+    try:
+        from IndicTransToolkit.processor import IndicProcessor
+    except (ImportError, ModuleNotFoundError):
+        try:
+            from IndicTransToolkit import IndicProcessor
+        except (ImportError, ModuleNotFoundError) as exc:
+            raise RuntimeError(
+                "IndicProcessor is unavailable. Install IndicTransToolkit "
+                "(for example: pip install IndicTransToolkit)."
+            ) from exc
+    return IndicProcessor
+
+
+def preprocess_sentences(sentences: List[str], source_short: str, target_short: str) -> List[str]:
+    """Apply IndicTrans2 inference preprocessing to a batch of sentences."""
+    IndicProcessor = _get_indic_processor()
+    processor = IndicProcessor(inference=True)
+    return list(processor.preprocess_batch(sentences, src_lang=source_short, tgt_lang=target_short))
+
+
+def postprocess_sentences(sentences: List[str], target_short: str) -> List[str]:
+    """Apply IndicTrans2 inference postprocessing to decoded translated sentences."""
+    IndicProcessor = _get_indic_processor()
+    processor = IndicProcessor(inference=True)
+    return list(processor.postprocess_batch(sentences, lang=target_short))

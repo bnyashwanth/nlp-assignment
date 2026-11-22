@@ -69,6 +69,7 @@ htmlcov/
 *.safetensors
 *.onnx
 frontend/android/app/src/main/assets/nllb/
+frontend/android/app/src/main/assets/indictrans2/
 *.ckpt
 *.h5
 checkpoints/

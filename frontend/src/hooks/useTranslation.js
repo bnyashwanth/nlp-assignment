@@ -36,7 +36,7 @@ export function useTranslation() {
 
   // Engine Mode & Performance Indicators
   const [translationMode, setTranslationMode] = useState('online'); // 'online' | 'offline'
-  const [translationEngine, setTranslationEngine] = useState('Online Backend (NLLB/LoRA)');
+  const [translationEngine, setTranslationEngine] = useState('AI4Bharat IndicTrans2 1B');
   const [isFallback, setIsFallback] = useState(false);
   const [isLocalFallback, setIsLocalFallback] = useState(false);
   const [latency, setLatency] = useState(null);
@@ -182,7 +182,7 @@ export function useTranslation() {
       setTranslatedText(response.translated_text);
       setLatency(response.latency_ms);
       setTranslationMode(response.mode || (isConnected ? 'online' : 'offline'));
-      setTranslationEngine(response.engine || (isConnected ? 'Online Python NLLB-200' : 'Offline Pure-NLP Engine'));
+      setTranslationEngine(response.engine || (isConnected ? 'AI4Bharat IndicTrans2 1B' : 'Offline IndicTrans2 ONNX'));
       setIsFallback(Boolean(response.isFallback));
       setIsLocalFallback(Boolean(response.isLocalFallback));
       setNlpDiagnostics(response.diagnostics || null);
@@ -198,7 +198,7 @@ export function useTranslation() {
         modelVariant,
         latencyMs: response.latency_ms,
         translationMode: response.mode || (isConnected ? 'online' : 'offline'),
-        translationEngine: response.engine || (isConnected ? 'Online Backend (NLLB/LoRA)' : 'Offline On-Device Model'),
+        translationEngine: response.engine || (isConnected ? 'AI4Bharat IndicTrans2 1B' : 'Offline IndicTrans2 ONNX'),
         isLocalFallback: Boolean(response.isLocalFallback),
       };
 
@@ -264,7 +264,7 @@ export function useTranslation() {
     setModelVariant(item.modelVariant);
     setLatency(item.latencyMs);
     setTranslationMode(item.translationMode || 'online');
-    setTranslationEngine(item.translationEngine || 'Online Backend (NLLB/LoRA)');
+    setTranslationEngine(item.translationEngine || 'AI4Bharat IndicTrans2 1B');
     setIsLocalFallback(Boolean(item.isLocalFallback));
     setShowHistoryModal(false);
   }, []);

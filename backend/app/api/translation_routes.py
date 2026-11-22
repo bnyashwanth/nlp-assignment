@@ -52,15 +52,15 @@ def list_languages():
     status_code=status.HTTP_200_OK,
     summary="Translate Text",
     description=(
-        "Translates text between English (eng_Latn) and Kannada (kan_Knda) using "
-        "either the Baseline NLLB-200 model or fine-tuned LoRA adapters."
+        "Translates text among English, Kannada, Hindi, Tamil, and Telugu using "
+        "an automatically selected AI4Bharat IndicTrans2 1B model family."
     ),
 )
-def translate_text(request: TranslationRequest):
+async def translate_text(request: TranslationRequest):
     """
     Executes text translation with input validation and timeout enforcement.
     """
-    return translation_service.translate_text(
+    return await translation_service.translate_text(
         text=request.text,
         source_lang=request.source_lang,
         target_lang=request.target_lang,
@@ -79,11 +79,11 @@ def translate_text(request: TranslationRequest):
         "Baseline, LoRA Fine-Tuned, and LoRA + Back-Translation, returning outputs side-by-side."
     ),
 )
-def compare_translations(request: ComparisonRequest):
+async def compare_translations(request: ComparisonRequest):
     """
     Executes side-by-side multi-model translation inference.
     """
-    return translation_service.compare_models(
+    return await translation_service.compare_models(
         text=request.text,
         source_lang=request.source_lang,
         target_lang=request.target_lang,

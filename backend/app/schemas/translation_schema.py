@@ -34,10 +34,9 @@ class TranslationRequest(BaseModel):
         description="FLORES-200 / BCP-47 target language code.",
         example="kan_Knda",
     )
-    model_variant: str = Field(
-        default="lora_bt",
-        description="Model architecture to use: 'baseline', 'lora', or 'lora_bt'.",
-        example="lora_bt",
+    model_variant: Optional[str] = Field(
+        default=None,
+        description="Optional legacy frontend field; IndicTrans2 routing ignores model_variant.",
     )
     num_beams: Optional[int] = Field(
         default=4,
@@ -51,13 +50,14 @@ class TranslationRequest(BaseModel):
 class TranslationResponse(BaseModel):
     """Response payload for POST /api/translate."""
 
-    source_text: str = Field(..., description="Original input text after normalization.")
+    source_text: Optional[str] = Field(default=None, description="Original input text after normalization.")
     translated_text: str = Field(..., description="Final translated target text.")
     source_lang: str = Field(..., description="Source language code.")
     target_lang: str = Field(..., description="Target language code.")
-    model_variant: str = Field(..., description="Model architecture used for generation.")
+    model_variant: Optional[str] = Field(default=None, description="Legacy optional model field.")
     latency_ms: float = Field(..., description="Inference execution time in milliseconds.")
-    character_count: int = Field(..., description="Character count of translated output.")
+    character_count: Optional[int] = Field(default=None, description="Character count of translated output.")
+    engine: str = Field(default="AI4Bharat IndicTrans2", description="IndicTrans2 engine identifier.")
 
 
 # ============================================================================

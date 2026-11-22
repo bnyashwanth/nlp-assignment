@@ -62,7 +62,7 @@ export default function App() {
           </section>
           <section className="feature-grid" aria-label="Features">
             <article><span>01</span><h2>Five Languages</h2><p>English, Kannada, Hindi, Tamil, and Telugu in one focused workspace.</p></article>
-            <article><span>02</span><h2>Natural Translation</h2><p>NLLB neural translation is available through the web service or as an embedded Android model.</p></article>
+            <article><span>02</span><h2>Natural Translation</h2><p>AI4Bharat IndicTrans2 neural translation is available through the web service or as an embedded Android model.</p></article>
             <article><span>03</span><h2>Built for Daily Text</h2><p>Translate messages, notes, and everyday passages without a cluttered interface.</p></article>
           </section>
         </main>

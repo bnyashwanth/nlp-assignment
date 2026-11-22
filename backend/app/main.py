@@ -39,8 +39,9 @@ async def lifespan(app: FastAPI):
     """
     logger.info("=" * 65)
     logger.info(f"Starting {settings.app_name} v{settings.app_version}")
-    logger.info(f"Base Model: {settings.base_model_name}")
-    logger.info(f"HF LoRA Repo: {settings.hf_lora_repo_id}")
+    logger.info("IndicTrans2 EN-INDIC: %s", settings.indictrans2_en_indic)
+    logger.info("IndicTrans2 INDIC-EN: %s", settings.indictrans2_indic_en)
+    logger.info("IndicTrans2 INDIC-INDIC: %s", settings.indictrans2_indic_indic)
     logger.info(f"Hardware Device: {model_manager.device}")
     logger.info(f"Neural Framework Ready: {model_manager.is_neural_ready}")
     logger.info(f"Port: {settings.port}")
@@ -62,10 +63,12 @@ app = FastAPI(
 
 # Enable Cross-Origin Resource Sharing (CORS)
 ALLOWED_ORIGINS = [
-    "*",
     "http://localhost",
     "http://localhost:5173",
     "http://localhost:3000",
+    "http://127.0.0.1",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8000",
     "http://localhost:8000",
     "http://localhost:7860",
     "https://localhost",
@@ -76,7 +79,8 @@ ALLOWED_ORIGINS = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_credentials=True,
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?",
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -143,8 +147,11 @@ async def root():
         "description": settings.app_description,
         "device": model_manager.device,
         "is_neural_ready": model_manager.is_neural_ready,
-        "base_model": settings.base_model_name,
-        "lora_repo": settings.hf_lora_repo_id,
+        "models": {
+            "en-indic": settings.indictrans2_en_indic,
+            "indic-en": settings.indictrans2_indic_en,
+            "indic-indic": settings.indictrans2_indic_indic,
+        },
         "endpoints": {
             "docs": "/docs",
             "languages": "/api/languages",

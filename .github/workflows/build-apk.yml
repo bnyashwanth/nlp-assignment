@@ -25,6 +25,10 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "21"
+ 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
 
       - name: Install frontend dependencies
         run: npm ci
@@ -36,16 +40,11 @@ jobs:
           npm run build
           npx cap sync android
 
-      - name: Bake Xenova NLLB-200 ONNX model into Android assets
-        env:
-          HF_BASE: https://huggingface.co/Xenova/nllb-200-distilled-600M/resolve/main
+      - name: Export and bake quantized IndicTrans2 ONNX models
         run: |
-          mkdir -p android/app/src/main/assets/nllb
-          curl -fL "$HF_BASE/onnx/encoder_model_quantized.onnx" -o android/app/src/main/assets/nllb/encoder_model_quantized.onnx
-          curl -fL "$HF_BASE/onnx/decoder_model_merged_quantized.onnx" -o android/app/src/main/assets/nllb/decoder_model_merged_quantized.onnx
-          curl -fL "$HF_BASE/tokenizer.json" -o android/app/src/main/assets/nllb/tokenizer.json
-          curl -fL "$HF_BASE/sentencepiece.bpe.model" -o android/app/src/main/assets/nllb/sentencepiece.bpe.model
-          curl -fL "$HF_BASE/config.json" -o android/app/src/main/assets/nllb/config.json
+          python -m pip install --upgrade pip
+          python -m pip install "optimum[onnxruntime]>=1.20" transformers sentencepiece onnx onnxruntime
+          python ../scripts/export_android_indictrans2.py --output android/app/src/main/assets/indictrans2
 
       - name: Build debug APK with Gradle
         run: |

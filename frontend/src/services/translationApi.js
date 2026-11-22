@@ -7,11 +7,11 @@
  * - Dynamic Backend URL: Reads from localStorage ('linguabridge_backend_url') first,
  *   falling back to VITE_API_BASE_URL or 'http://localhost:8000'.
  * - Test Connection helper (GET /health) for laptop/cloud backend connectivity testing.
- * - 45,000 ms timeout for CPU NLLB-200 Seq2Seq neural inference.
+ * - 45,000 ms timeout for CPU IndicTrans2 1B Seq2Seq neural inference.
  * - Zero-Error Offline Guarantee: If device is offline or backend is unreachable/times out,
  *   seamlessly returns from localStorage cache first, then Pure-NLP engine (Exp 1, 2, 3).
  *   Never displays a red "Failed to fetch" banner when offline.
- * - Clear mode badges: 'Online Python NLLB-200', 'Offline NLP Cache', 'Offline Pure-NLP Engine'.
+ * - Clear mode badges: 'AI4Bharat IndicTrans2 1B', 'Offline IndicTrans2 ONNX', 'Offline NLP Cache'.
  */
 
 import { translateOffline } from './offlineTranslation';
@@ -19,11 +19,11 @@ import { getCachedTranslation, saveCachedTranslation } from './translationCache'
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { detectScript } from '../nlp/offlineNlpEngine';
 
-const NllbOfflinePlugin = registerPlugin('NllbOfflinePlugin');
+const IndicTransOfflinePlugin = registerPlugin('IndicTransOfflinePlugin');
 
 export const BACKEND_URL_STORAGE_KEY = 'linguabridge_backend_url';
 export const DEFAULT_REQUEST_TIMEOUT_MS = 10000;       // 10 seconds for health/metrics
-export const TRANSLATION_REQUEST_TIMEOUT_MS = 45000;   // 45 seconds for CPU NLLB inference
+export const TRANSLATION_REQUEST_TIMEOUT_MS = 45000;   // 45 seconds for CPU IndicTrans2 inference
 
 /**
  * Retrieves the currently active Backend API Base URL.
@@ -224,13 +224,13 @@ export async function translateText({
       model_variant,
       latency_ms: 0,
       mode: 'online',
-      engine: 'Online Python NLLB-200',
+      engine: 'AI4Bharat IndicTrans2 1B',
     };
   }
 
   if (Capacitor.isNativePlatform()) {
     try {
-      const nativeResult = await NllbOfflinePlugin.translate({
+      const nativeResult = await IndicTransOfflinePlugin.translate({
         text: trimmed,
         sourceLang: source_lang,
         targetLang: target_lang,
@@ -241,14 +241,16 @@ export async function translateText({
         source_lang,
         target_lang,
         mode: 'offline',
-        engine: 'Offline Xenova NLLB-200 ONNX',
+        engine: 'Offline AI4Bharat IndicTrans2 ONNX',
         isOffline: true,
         latency_ms: nativeResult.latencyMs || 0,
       };
       saveCachedTranslation(trimmed, source_lang, target_lang, result);
       return result;
     } catch (nativeError) {
-      console.warn('[NllbOfflinePlugin] Native ONNX unavailable, using bundled NLP fallback:', nativeError.message);
+      const nativeMessage = nativeError?.message || String(nativeError);
+      console.error(`[IndicTransOfflinePlugin] Native IndicTrans2 ONNX failed: ${nativeMessage}`);
+      throw new Error(`Offline IndicTrans2 ONNX unavailable: ${nativeMessage}`);
     }
   }
 
@@ -297,7 +299,7 @@ export async function translateText({
       const result = {
         ...response,
         mode: 'online',
-        engine: 'Online Python NLLB-200',
+        engine: 'AI4Bharat IndicTrans2 1B',
         latency_ms: response.latency_ms || 45,
       };
       saveCachedTranslation(trimmed, source_lang, target_lang, result);

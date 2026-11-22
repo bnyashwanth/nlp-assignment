@@ -6,6 +6,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(android.os.Bundle savedInstanceState) {
         registerPlugin(NllbOfflinePlugin.class);
+        registerPlugin(IndicTransOfflinePlugin.class);
         super.onCreate(savedInstanceState);
     }
 }

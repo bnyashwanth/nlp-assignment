@@ -27,19 +27,31 @@ class AppConfig(BaseSettings):
     app_name: str = "LinguaBridge AI - Translation API"
     app_version: str = "1.0.0"
     app_description: str = (
-        "Production-grade Neural Machine Translation API for English ↔ Kannada "
-        "(eng_Latn ↔ kan_Knda) using facebook/nllb-200-distilled-600M and LoRA."
+        "Production-grade Neural Machine Translation API for English, Kannada, Hindi, "
+        "Tamil, and Telugu using AI4Bharat IndicTrans2 1B models."
     )
     port: int = int(os.getenv("PORT", "8000"))  # Default local port 8000 (overridden by PORT env)
     debug: bool = os.getenv("DEBUG", "false").lower() == "true"
 
-    # Foundation & Adapter Models
-    base_model_name: str = os.getenv(
-        "BASE_MODEL_NAME", "facebook/nllb-200-distilled-600M"
+    # IndicTrans2 model families
+    indictrans2_en_indic: str = os.getenv(
+        "INDICTRANS2_EN_INDIC",
+        "ai4bharat/indictrans2-en-indic-1B",
     )
-    hf_lora_repo_id: str = os.getenv(
-        "HF_LORA_REPO_ID", "linguabridge-ai/nllb200-lora-eng-kan"
+    indictrans2_indic_en: str = os.getenv(
+        "INDICTRANS2_INDIC_EN",
+        "ai4bharat/indictrans2-indic-en-1B",
     )
+    indictrans2_indic_indic: str = os.getenv(
+        "INDICTRANS2_INDIC_INDIC",
+        "ai4bharat/indictrans2-indic-indic-1B",
+    )
+    fallback_model_name: str = os.getenv(
+        "FALLBACK_MODEL_NAME",
+        "facebook/nllb-200-distilled-600M",
+    )
+    use_nllb_fallback: bool = os.getenv("USE_NLLB_FALLBACK", "true").lower() == "true"
+    hf_token: Optional[str] = os.getenv("HF_TOKEN", None)
     hf_token: Optional[str] = os.getenv("HF_TOKEN", None)
 
     # Local fallback adapter path (if running locally or mounting storage)

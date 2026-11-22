@@ -8,6 +8,17 @@ This report distinguishes implementation evidence from documentation claims. Any
 that cannot be established from repository contents is marked `[UNVERIFIED]`; an
 expected artifact that is absent is marked `[NOT FOUND IN REPO]`.
 
+### IndicTrans2 upgrade status
+
+The web modular backend under `backend/app/` has been upgraded to route among the
+AI4Bharat IndicTrans2 1B families `ai4bharat/indictrans2-en-indic-1B`,
+`ai4bharat/indictrans2-indic-en-1B`, and
+`ai4bharat/indictrans2-indic-indic-1B`. The Android native plugin upgrade is
+implemented as `frontend/android/app/src/main/java/ai/linguabridge/app/IndicTransOfflinePlugin.java`;
+the export procedure is implemented in `scripts/export_android_indictrans2.py`.
+Model downloads and real inference remain `[UNVERIFIED]` until a Hugging Face
+authorized model cache/token is available and Android SDK/model assets are tested.
+
 ## 1. Exact System Architecture
 
 ### 1.1 Component topology

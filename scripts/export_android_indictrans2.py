@@ -1,0 +1,131 @@
+"""Export IndicTrans2 Seq2Seq families for Android ONNX Runtime."""
+
+import argparse
+import json
+import shutil
+from pathlib import Path
+
+
+DIST_MODEL_FAMILIES = {
+    "en-indic": "ai4bharat/indictrans2-en-indic-dist-200M",
+    "indic-en": "ai4bharat/indictrans2-indic-en-dist-200M",
+    "indic-indic": "ai4bharat/indictrans2-indic-indic-dist-320M",
+}
+
+FULL_MODEL_FAMILIES = {
+    "en-indic": "ai4bharat/indictrans2-en-indic-1B",
+    "indic-en": "ai4bharat/indictrans2-indic-en-1B",
+    "indic-indic": "ai4bharat/indictrans2-indic-indic-1B",
+}
+
+
+def quantize_dynamic(model_path: Path) -> None:
+    from onnxruntime.quantization import (
+        QuantType,
+        quantize_dynamic,
+    )
+
+    quantized_path = model_path.with_name(model_path.stem + "_quantized.onnx")
+    quantize_dynamic(
+        model_path.as_posix(),
+        quantized_path.as_posix(),
+        weight_type=QuantType.QInt8,
+    )
+
+
+def export_family(family: str, model_name: str, output_root: Path) -> None:
+    try:
+        from optimum.onnxruntime import ORTModelForSeq2SeqLM
+        from transformers import AutoTokenizer
+    except ImportError as exc:
+        raise RuntimeError(
+            "Export dependencies are missing. Install optimum[onnxruntime] "
+            "and transformers."
+        ) from exc
+
+    destination = output_root / family
+    destination.mkdir(parents=True, exist_ok=True)
+    temporary = destination / "_export"
+    temporary.mkdir(parents=True, exist_ok=True)
+
+    print(f"Exporting {model_name} -> {destination}")
+    model = ORTModelForSeq2SeqLM.from_pretrained(
+        model_name,
+        export=True,
+        trust_remote_code=True,
+    )
+    model.save_pretrained(temporary)
+
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_name,
+        trust_remote_code=True,
+    )
+    tokenizer.save_pretrained(destination)
+
+    encoder_source = next(temporary.glob("encoder_model*.onnx"), None)
+    decoder_source = next(
+        (p for p in temporary.glob("decoder_model*.onnx") if "merged" in p.name),
+        next(temporary.glob("decoder_model*.onnx"), None),
+    )
+    if encoder_source is None or decoder_source is None:
+        shutil.rmtree(temporary, ignore_errors=True)
+        raise RuntimeError(
+            f"Optimum did not produce expected encoder/decoder ONNX files for {model_name}"
+        )
+
+    quantize_dynamic(encoder_source)
+    quantize_dynamic(decoder_source)
+
+    encoder_quantized = encoder_source.with_name(encoder_source.stem + "_quantized.onnx")
+    decoder_quantized = decoder_source.with_name(decoder_source.stem + "_quantized.onnx")
+    shutil.move(str(encoder_quantized), str(destination / "encoder_model_quantized.onnx"))
+    shutil.move(str(decoder_quantized), str(destination / "decoder_model_merged_quantized.onnx"))
+
+    for name in ("config.json", "generation_config.json"):
+        source = temporary / name
+        if source.exists():
+            shutil.copy2(source, destination / name)
+    shutil.rmtree(temporary, ignore_errors=True)
+
+    with (destination / "export_metadata.json").open("w", encoding="utf-8") as handle:
+        json.dump(
+            {
+                "family": family,
+                "source_model": model_name,
+                "quantization": "dynamic INT8",
+                "weights": [
+                    "encoder_model_quantized.onnx",
+                    "decoder_model_merged_quantized.onnx",
+                ],
+            },
+            handle,
+            indent=2,
+        )
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Export IndicTrans2 ONNX models for Android")
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path("frontend/android/app/src/main/assets/indictrans2"),
+    )
+    parser.add_argument("--use-1b", action="store_true", help="Export the 1B model families")
+    parser.add_argument(
+        "--families",
+        nargs="+",
+        choices=["en-indic", "indic-en", "indic-indic"],
+        default=["en-indic", "indic-en", "indic-indic"],
+    )
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+    families = FULL_MODEL_FAMILIES if args.use_1b else DIST_MODEL_FAMILIES
+    for family in args.families:
+        export_family(family, families[family], args.output)
+
+
+if __name__ == "__main__":
+    main()
