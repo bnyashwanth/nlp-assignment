@@ -59,15 +59,6 @@ def bake_public_nllb_fallback(destination: Path) -> str:
 
 
 def export_family(family: str, model_name: str, output_root: Path) -> None:
-    try:
-        from optimum.onnxruntime import ORTModelForSeq2SeqLM
-        from transformers import AutoTokenizer
-    except ImportError as exc:
-        raise RuntimeError(
-            "Export dependencies are missing. Install optimum[onnxruntime] "
-            "and transformers."
-        ) from exc
-
     destination = output_root / family
     destination.mkdir(parents=True, exist_ok=True)
     temporary = destination / "_export"
@@ -75,6 +66,14 @@ def export_family(family: str, model_name: str, output_root: Path) -> None:
 
     print(f"Exporting {model_name} -> {destination}")
     try:
+        try:
+            from optimum.onnxruntime import ORTModelForSeq2SeqLM
+            from transformers import AutoTokenizer
+        except ImportError as exc:
+            raise RuntimeError(
+                "Optimum/Transformers are not installed; using public NLLB ONNX fallback"
+            ) from exc
+
         model = ORTModelForSeq2SeqLM.from_pretrained(
             model_name,
             export=True,
