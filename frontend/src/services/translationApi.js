@@ -39,6 +39,18 @@ export function getBackendBaseUrl() {
     console.warn('[API] Could not access localStorage for backend URL:', e);
   }
 
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    const isLocalHost =
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname === '[::1]';
+
+    if (!isLocalHost) {
+      return window.location.origin;
+    }
+  }
+
   const envUrl = (import.meta.env.VITE_API_BASE_URL || '').trim();
   if (envUrl) {
     return envUrl.replace(/\/+$/, '');
