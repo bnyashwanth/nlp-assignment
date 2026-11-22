@@ -333,7 +333,6 @@ public class IndicTransOfflinePlugin extends Plugin {
                 for (int i = 0; i < generated.size(); i++) decoderIds[i] = generated.get(i);
 
                 Map<String, OnnxTensor> decoderInputs = new HashMap<>();
-                Map<String, OnnxTensor> decoderInfo = new HashMap<>();
                 for (String name : decoderSession.getInputNames()) {
                     String lower = name.toLowerCase();
                     if (lower.contains("use_cache_branch")) {
