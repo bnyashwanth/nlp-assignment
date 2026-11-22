@@ -240,6 +240,8 @@ export async function translateText({
     };
   }
 
+  let nativeWarning = null;
+
   if (Capacitor.isNativePlatform()) {
     try {
       const nativeResult = await IndicTransOfflinePlugin.translate({
@@ -262,7 +264,7 @@ export async function translateText({
     } catch (nativeError) {
       const nativeMessage = nativeError?.message || String(nativeError);
       console.error(`[IndicTransOfflinePlugin] Native IndicTrans2 ONNX failed: ${nativeMessage}`);
-      throw new Error(`Offline IndicTrans2 ONNX unavailable: ${nativeMessage}`);
+      nativeWarning = `Offline IndicTrans2 ONNX unavailable: ${nativeMessage}`;
     }
   }
 
@@ -277,6 +279,7 @@ export async function translateText({
         mode: 'offline',
         engine: 'Offline NLP Cache',
         isOffline: true,
+        warning: nativeWarning || undefined,
       };
     }
 
@@ -290,6 +293,8 @@ export async function translateText({
       ...offlineResult,
       mode: 'offline',
       engine: 'Offline Pure-NLP Engine',
+      warning: nativeWarning || undefined,
+      nativeError: nativeWarning || undefined,
     };
   }
 
@@ -313,6 +318,7 @@ export async function translateText({
         mode: 'online',
         engine: 'AI4Bharat IndicTrans2 1B',
         latency_ms: response.latency_ms || 45,
+        warning: nativeWarning || undefined,
       };
       saveCachedTranslation(trimmed, source_lang, target_lang, result);
       return result;
@@ -328,6 +334,8 @@ export async function translateText({
       mode: 'offline',
       engine: 'Offline NLP Cache (Fallback)',
       isFallback: true,
+      warning: nativeWarning || undefined,
+      nativeError: nativeWarning || undefined,
     };
   }
 
@@ -342,6 +350,8 @@ export async function translateText({
     mode: 'offline',
     engine: 'Offline Pure-NLP Engine (Fallback)',
     isFallback: true,
+    warning: nativeWarning || undefined,
+    nativeError: nativeWarning || undefined,
   };
 
   saveCachedTranslation(trimmed, source_lang, target_lang, finalFallback);

@@ -152,6 +152,12 @@ public class IndicTransOfflinePlugin extends Plugin {
             byte[] buffer = new byte[1024 * 1024];
             int read;
             while ((read = input.read(buffer)) != -1) output.write(buffer, 0, read);
+        } catch (java.io.FileNotFoundException error) {
+            throw new IllegalStateException(
+                "Missing Android ONNX asset indictrans2/" + relativeAsset
+                    + ". Rebuild/rerun model export before installing the APK.",
+                error
+            );
         }
     }
 
@@ -294,7 +300,11 @@ public class IndicTransOfflinePlugin extends Plugin {
             call.resolve(result);
         } catch (Exception error) {
             Log.e(TAG, "IndicTrans2 native inference failed", error);
-            call.reject("INDICTRANS_ONNX_ERROR", error);
+            String message = error.getMessage();
+            if (message == null || message.trim().isEmpty()) {
+                message = error.getClass().getSimpleName();
+            }
+            call.reject("INDICTRANS_ONNX_ERROR", message);
         }
     }
 

@@ -181,6 +181,7 @@ export function useTranslation() {
 
       setTranslatedText(response.translated_text);
       setLatency(response.latency_ms);
+      setError(response.warning || null);
       setTranslationMode(response.mode || (isConnected ? 'online' : 'offline'));
       setTranslationEngine(response.engine || (isConnected ? 'AI4Bharat IndicTrans2 1B' : 'Offline IndicTrans2 ONNX'));
       setIsFallback(Boolean(response.isFallback));
